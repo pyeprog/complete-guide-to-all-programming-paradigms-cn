@@ -15,6 +15,7 @@ project:
         - file: chapters/declarative-model
     - file: chapters/about-concurrency
       children:
+        - file: chapters/declarative-concurrency
         - file: chapters/message-passing
         - file: chapters/concurrency-oriented-model
     - file: chapters/explicit-state-model

@@ -1,4 +1,4 @@
-# Explicit State Model
+# 显式状态模型
 
 ![[Think 2025-06-22 21.06.51.excalidraw]]
 接下来让我们进入explicit state显式状态模型中
