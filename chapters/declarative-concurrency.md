@@ -1,4 +1,4 @@
-# Declarative Concurrency
+# 声明式并发模型
 
 接下来, 我们在declarative model上引入并发的概念, 形成声明式并发模型.
 

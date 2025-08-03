@@ -1,4 +1,4 @@
-# Declarative Model
+# 声明式模型
 
 declarative model是最简单, 最实用的模型. 也是大部份现代语言的基础.
 declarative风格关注于what, 而不是how. 你需要表明你要什么, 而不是指定怎么做
