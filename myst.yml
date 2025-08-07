@@ -2,11 +2,20 @@
 version: 1
 project:
   id: b50c9997-373a-4f4d-84d8-3b6974f35b46
+  license: CC-BY-4.0
+  open_access: true
   title: "编程语言全景探索"
+  subtitle: 如何一次性学会所有编程语言
   # description:
-  keywords: ["programming language"]
-  authors: ["长路"]
+  keywords: ["模型", "声明式", "函数式", "OOP", "面向并发", "显示状态", "逻辑编程", "元编程", "限制编程"]
+  authors: 
+    - name: 长路
+      email: pyeprog@icloud.com
   github: "pyeprog/complete-guide-to-all-programming-paradigms-cn"
+  binder: https://www.bilibili.com/video/BV1Fpgbz4EvN/?share_source=copy_web&vd_source=23cc890afc1c4768bfa49bbf1c50ad48
+  social:
+    github: "pyeprog"
+    youtube: "@PyeLeon"
   toc:
     - file: chapters/intro.md
     - title: 基础模型
@@ -51,5 +60,8 @@ site:
   template: book-theme
   title: 编程语言全景探索
   options:
-    logo: logo.png
-  #   favicon: favicon.ico
+    logo: book-logo.png
+    favicon: book-logo.ico
+  nav:
+    - title: 视频
+      url: https://www.bilibili.com/video/BV1Fpgbz4EvN/?share_source=copy_web&vd_source=23cc890afc1c4768bfa49bbf1c50ad48
