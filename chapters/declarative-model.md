@@ -53,6 +53,7 @@ printf("%d", num);
 ```{code} lisp
 :linenos:
 :filename: var.lisp
+:emphasize-lines: 1
 
 (let ((num1 1) (num2 2))  ; 在let表达式中定义num1和num2
  (format t "~A ~A" num1 num2))
@@ -153,6 +154,7 @@ add 1 2    // in haskell
 ```{code} python
 :linenos:
 :filename: func.py
+:emphasize-lines: 3,4
 
 def outer_func():
   # define inner_func inside of outer_func
@@ -203,6 +205,7 @@ switch (x) {
 ```{code} rust
 :linenos:
 :filename: match.rs
+:emphasize-lines: 23, 26
 
 let x = 4
 
@@ -386,6 +389,9 @@ Paul Graham在[^ansi-lisp]中提到了另一种写递归的视角
 :::
 
 ```{code} python
+:linenos:
+:filename: reverse_linked_list.py
+
 from dataclasses import dataclass
 from typing import Any, Optional
 
@@ -402,6 +408,9 @@ class Node:
 ::::{tab-item} step 0
 
 ```{code} python
+:linenos:
+:filename: reverse_linked_list.py
+:emphasize-lines: 2
 # 定义函数: 传入链表头节点, 返回翻转后链表的头节点
 def reverse(head: Node) -> Node:
     ...
@@ -418,6 +427,10 @@ def reverse(head: Node) -> Node:
 ::::{tab-item} step 1
 
 ```{code} python
+:linenos:
+:filename: reverse_linked_list.py
+:emphasize-lines: 4
+
 # 调用本函数, 实现函数体, 并得到最终结果
 def reverse(head: Node) -> Node:
     sec = head.next
@@ -437,6 +450,9 @@ def reverse(head: Node) -> Node:
 :::{tab-item} step 2
 
 ```{code} python
+:linenos:
+:filename: reverse_linked_list.py
+:emphasize-lines: 3,4,6,7
 # 检查递归停止条件
 def reverse(head: Node) -> Node:
     if not head:  # add defence

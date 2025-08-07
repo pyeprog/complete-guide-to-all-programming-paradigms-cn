@@ -8,39 +8,40 @@ project:
   authors: ["长路"]
   github: "pyeprog/complete-guide-to-all-programming-paradigms-cn"
   toc:
-    - file: chapters/intro
+    - file: chapters/intro.md
     - title: 基础模型
       children:
-        - file: chapters/core
-        - file: chapters/declarative-model
-    - file: chapters/about-concurrency
+        - file: chapters/core.md
+        - file: chapters/declarative-model.md
+    - file: chapters/about-concurrency.md
       children:
-        - file: chapters/declarative-concurrency
-        - file: chapters/message-passing
-        - file: chapters/concurrency-oriented-model
-    - file: chapters/explicit-state-model
+        - file: chapters/declarative-concurrency.md
+        - file: chapters/message-passing.md
+        - file: chapters/concurrency-oriented-model.md
+    - file: chapters/explicit-state-model.md
     - title: 显式状态下的并发模型
       children:
-        - file: chapters/stateful-concurrency
-        - file: chapters/coroutine
-        - file: chapters/async
-    - file: chapters/object-overview
+        - file: chapters/stateful-concurrency.md
+        - file: chapters/coroutine.md
+        - file: chapters/async.md
+    - file: chapters/object-overview.md
       children:
-        - file: chapters/modular-model
-        - file: chapters/object-based-model
-        - file: chapters/object-oriented-model
-        - file: chapters/concurrent-oop
-    - file: chapters/functional-model
+        - file: chapters/modular-model.md
+        - file: chapters/object-based-model.md
+        - file: chapters/object-oriented-model.md
+        - file: chapters/concurrent-oop.md
+    - file: chapters/functional-model.md
     - title: 规划求解相关模型
       children:
-        - file: chapters/logic-programming
-        - file: chapters/constraint-programming
+        - file: chapters/logic-programming.md
+        - file: chapters/constraint-programming.md
     - title: 元编程
-      file: chapters/meta-programming
-    - title: 其他
+      file: chapters/meta-programming.md
+    - title: 拾遗
       children:
-        - file: chapters/language-learning-guide
-        - file: chapters/whats-next
+        - file: chapters/ref.md
+        - file: chapters/language-learning-guide.md
+        - file: chapters/whats-next.md
 
   # To autogenerate a Table of Contents, run "jupyter book init --write-toc"
   # toc:

@@ -37,6 +37,7 @@
 
 ```{code} java
 :linenos:
+:emphasize-lines: 3
 
 class MyThread extends Thread {
     @Override
@@ -59,6 +60,7 @@ public class Demo {
 
 ```{code} rust
 :linenos:
+:emphasize-lines: 8
 
 use std::thread
 
@@ -84,6 +86,7 @@ fn main() {
 
 ```{code} go
 :linenos:
+:emphasize-lines: 6
 
 func work() {
     // do actual work here
@@ -100,6 +103,7 @@ func main() {
 
 ```{code} elixir
 :linenos:
+:emphasize-lines: 4
 
 func = fn ->
     # do actual work here
@@ -120,6 +124,7 @@ pid = spawn(func)  # spawn a process(light-thread) to do the work
 ```{code} oz
 :linenos:
 :filename: expr_as_entry.oz
+:emphasize-lines: 2
 
 declare X in 
 X = thread 10 * 10 end + 100 * 100
@@ -133,6 +138,7 @@ X = thread 10 * 10 end + 100 * 100
 ```{code} oz
 :linenos:
 :filename: block_as_entry.oz
+:emphasize-lines: 2,3,4,5,6,7,8,9,10
 
 declare X0 X1 X2 X3 in
 thread

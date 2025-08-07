@@ -60,6 +60,8 @@
 ```{code} python
 :linenos:
 :caption: 简单的代码示例
+:filename: coroutine_example.py
+:emphasize-lines: 3,5,12,14,18,22
 
 def sub_coroutine():
     print("Sub-coroutine started")
@@ -129,6 +131,7 @@ for value in gen:
 ```{code} python
 :linenos:
 :filename: fsm.py
+:emphasize-lines: 6,13
 
 def traffic_light():
     state = "red"

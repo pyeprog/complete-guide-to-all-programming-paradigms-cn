@@ -147,6 +147,7 @@ Erlang的三位作者之一, Erlang将actor model发扬光大
 ```{code} elixir
 :linenos:
 :filename: msg_handle.ex
+:emphasize-lines: 3-8
 :caption: 孵化Talker线程后，我们会获得该线程的pid，通过向pid发送消息来触发Talker中对应的处理函数。Talker调用loop方法并递归执行，相当于循环运行该方法。receive在消息队列为空时会挂起线程，待有消息时恢复运行，类似于CSP模型中的select。该例子来自[^elixir-in-action]
 
 defmodule Talker do
@@ -185,6 +186,7 @@ Actor model中线程可以link在一起, 其中一个崩溃退出, 另一个也�
 ```{code} elixir
 :linenos:
 :filename: simple_supervisor.ex
+:emphasize-lines: 4,7,14-17
 
 defmodule Example do
   def start do
@@ -216,6 +218,7 @@ Example.start()
 ```{code} elixir
 :linenos:
 :filename: the_supervisor.ex
+:emphasize-lines: 17,21,45
 :label: supervisor-impl
 
 defmodule Worker do
@@ -289,6 +292,7 @@ Actor模型提出了一种非常强大的范式，能够极大地影响代码的
 ```{code} elixir
 :linenos:
 :filename: get_return_val.ex
+:emphasize-lines: 5,8-11,21
 
 defmodule main do
 
@@ -334,6 +338,7 @@ end
 ```{code} elixir
 :linenos:
 :filename: jump_out_of_nested_recursion.ex
+:emphasize-lines: 3,12-16
 
 defmodule RecursionThrow do
   def nested_recursion(n) when n <= 0 do
@@ -380,6 +385,7 @@ RecursionThrow.run()
 ```{code} elixir
 :linenos:
 :filename: fsm.ex
+:emphasize-lines: 3,15
 
 def start do
   spawn(fn ->
@@ -426,6 +432,7 @@ end
 ```{code} elixir
 :linenos:
 :filename: name_service.ex
+:emphasize-lines: 31-41
 
 defmodule NameService do
   use GenServer

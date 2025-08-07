@@ -53,57 +53,58 @@ channel具有以下几个主要特性：
 ```{code} go
 :linenos:
 :filename: channel_usage.go
+:emphasize-lines: 10,20,31,45
 
 package main
 
 import (
- "fmt"
- "time"
+  "fmt"
+  "time"
 )
 
 func main() {
- // 无缓冲区的channel (容量为0)
- ch1 := make(chan int)
+  // 无缓冲区的channel (容量为0)
+  ch1 := make(chan int)
 
- go func() {
-  // 运行这一句时线程会阻塞, 只有当ch1被读取时, 42才被成功传递
-  ch1 <- 42 
- }()
+  go func() {
+    // 运行这一句时线程会阻塞, 只有当ch1被读取时, 42才被成功传递
+    ch1 <- 42 
+  }()
 
- fmt.Println("Received from ch1:", <-ch1)
+  fmt.Println("Received from ch1:", <-ch1)
 
- // 有缓冲区的channel, 缓冲区容量为2
- ch2 := make(chan string, 2)
- ch2 <- "hello"
- ch2 <- "world"
- // ch2 <- "!"  // 若执行则会阻塞
+  // 有缓冲区的channel, 缓冲区容量为2
+  ch2 := make(chan string, 2)
+  ch2 <- "hello"
+  ch2 <- "world"
+  // ch2 <- "!"  // 若执行则会阻塞
 
- fmt.Println("Received from ch2:", <-ch2)
- fmt.Println("Received from ch2:", <-ch2)
+  fmt.Println("Received from ch2:", <-ch2)
+  fmt.Println("Received from ch2:", <-ch2)
 
- // 关闭channel
- ch3 := make(chan int, 1)
- ch3 <- 100
- close(ch3)
+  // 关闭channel
+  ch3 := make(chan int, 1)
+  ch3 <- 100
+  close(ch3)
 
- // 从已关闭的channel中收取数据, 当数据全部取出后, 再取则会得到默认值
- for v := range ch3 {
-  fmt.Println("Received from closed ch3:", v)
- }
+  // 从已关闭的channel中收取数据, 当数据全部取出后, 再取则会得到默认值
+  for v := range ch3 {
+    fmt.Println("Received from closed ch3:", v)
+  }
 
- // 取值时感知channel是否被关闭
- ch4 := make(chan int)
- go func() {
-  time.Sleep(time.Second)
-  close(ch4)
- }()
+  // 取值时感知channel是否被关闭
+  ch4 := make(chan int)
+  go func() {
+    time.Sleep(time.Second)
+    close(ch4)
+  }()
 
- v, ok := <-ch4
- if !ok {
-  fmt.Println("ch4 is closed, no more data")
- } else {
-  fmt.Println("Received from ch4:", v)
- }
+  v, ok := <-ch4
+  if !ok {
+    fmt.Println("ch4 is closed, no more data")
+  } else {
+    fmt.Println("Received from ch4:", v)
+  }
 }
 ```
 
@@ -116,43 +117,44 @@ func main() {
 ```{code} go
 :linenos:
 :filename: select_usage.go
+:emphasize-lines: 25-35
 
 package main
 
 import (
- "fmt"
- "time"
+  "fmt"
+  "time"
 )
 
 func main() {
- ch1 := make(chan string)
- ch2 := make(chan string)
+  ch1 := make(chan string)
+  ch2 := make(chan string)
 
- // 经过一定延迟再发送信息
- go func() {
-  time.Sleep(1 * time.Second)
-  ch1 <- "message from ch1"
- }()
+  // 经过一定延迟再发送信息
+  go func() {
+    time.Sleep(1 * time.Second)
+    ch1 <- "message from ch1"
+  }()
 
- go func() {
-  time.Sleep(2 * time.Second)
-  ch2 <- "message from ch2"
- }()
+  go func() {
+    time.Sleep(2 * time.Second)
+    ch2 <- "message from ch2"
+  }()
 
- for i := 0; i < 2; i++ {
-  // 并联ch1, ch2和timeout channel
-  select {
+  for i := 0; i < 2; i++ {
+    // 并联ch1, ch2和timeout channel
+    select {
     case msg1 := <-ch1:
-     fmt.Println("Received:", msg1)
+      fmt.Println("Received:", msg1)
     case msg2 := <-ch2:
-     fmt.Println("Received:", msg2)
+      fmt.Println("Received:", msg2)
     case <-time.After(3 * time.Second):
-    {
-     fmt.Println("Timeout: no message received")
-     break
+      {
+        fmt.Println("Timeout: no message received")
+        break
+      }
     }
   }
- }
 }
 ```
 
@@ -174,41 +176,39 @@ func main() {
 :linenos:
 :filename: channel_owner.go
 :caption: 该例子来自[^concurrency-in-go]
+:emphasize-lines: 10
 
 package main
 
 import "fmt"
 
-func chanOwner() <- chan int {
- results := make(chan int, 5)
+func chanOwner() <-chan int {
+  results := make(chan int, 5)
 
- go func() {
-  // 当前goroutine负责关闭results这个channel
-  defer close(results)
+  go func() {
+    // 当前goroutine负责关闭results这个channel
+    defer close(results)
 
-  for i := 0; i <= 5; i++ {
-   results <- i
+    for i := 0; i <= 5; i++ {
+      results <- i
+    }
+  }()
+
+  return results
+}
+
+func consumer(results <-chan int) {
+  for result := range results {
+    fmt.Printf("Receive: %d\n", result)
   }
- }()
-
- return results
+  fmt.Printf("Done receiving")
 }
-
-
-func consumer(results <- chan int) {
- for result := range results {
-  fmt.Printf("Receive: %d\n", result)
- }
- fmt.Printf("Done receiving")
-}
-
 
 func main() {
- // 通过调用chanOwner来启动goroutine, 并返回其输出的channel
- results := chanOwner()
- consumer(results)
+  // 通过调用chanOwner来启动goroutine, 并返回其输出的channel
+  results := chanOwner()
+  consumer(results)
 }
-
 ```
 
 ### Managing Channel
@@ -224,49 +224,52 @@ func main() {
 :linenos:
 :filename: managing_channel.go
 :caption: 该例子来自[^concurrency-in-go]
+:emphasize-lines: 9, 23, 24
 
 package main
 
-import "fmt"
-import "time"
+import (
+  "fmt"
+  "time"
+)
 
-
+// done是控制信号channel, 类型是interface{}, 意味着控制信号是什么类型都可以
 func doWork(
- // done是控制信号channel, 类型是interface{}, 意味着控制信号是什么类型都可以
- done <- chan interface{},  
- strings <- chan string,
-) <- chan interface{} {
- // terminated这个channel用来展示goroutine的存活状态
- terminated := make(chan interface{})
+  done <-chan interface{},
+  strings <-chan string,
+) <-chan interface{} {
+  // terminated这个channel用来展示goroutine的存活状态
+  terminated := make(chan interface{})
 
- go func() {
-  defer fmt.Println("doWork exits")
-  defer close(terminated)
+  go func() {
+    defer fmt.Println("doWork exits")
+    defer close(terminated)
 
-  for {
-   select {
-   case s := <- strings:
-    fmt.Println(s)
-   case <- done:  // 通过select并联数据和控制channel, 来实现控制退出
-    return
-   }
-  }
- }()
- 
- return terminated
+    for {
+      select {
+      case s := <-strings:
+        fmt.Println(s)
+      case <-done: // 通过select并联数据和控制channel, 来实现控制退出
+        return
+      }
+    }
+  }()
+
+  return terminated
 }
 
 func main() {
- done := make(chan interface{})
- input1 := make(chan string)
- input2 := make(chan string)
+  done := make(chan interface{})
+  input1 := make(chan string)
+  input2 := make(chan string)
 
- terminated1 := doWork(done, input1)
- doWork(terminated1, input2)  // 这里启动了两个goroutine, 第一个退出, 第二个也要退出
+  terminated1 := doWork(done, input1)
+  doWork(terminated1, input2) // 这里启动了两个goroutine, 第一个退出, 第二个也要退出
 
- close(done)
- time.Sleep(1 * time.Second)
+  close(done)
+  time.Sleep(1 * time.Second)
 }
+
 ```
 
 ## CSP模型可以实现哪些功能或应用?
@@ -296,79 +299,81 @@ func main() {
 
 ```{code} go
 :linenos:
+:filename: simple_pipeline.go
+:emphasize-lines: 62-64
 
 package main
 
 import (
- "context"
- "fmt"
+  "context"
+  "fmt"
 )
 
 // Stage 1: 输出nums中的数字
 // 这里ctx可以理解为是对控制channel的封装
 // 一般我们使用context而不是使用自己封装的控制channel
 func gen(ctx context.Context, nums ...int) <-chan int {
- out := make(chan int)
- go func() {
-  defer close(out)
-  for _, n := range nums {
-   select {
-   case <-ctx.Done():
-    return
-   case out <- n:
-   }
-  }
- }()
- return out
+  out := make(chan int)
+  go func() {
+    defer close(out)
+    for _, n := range nums {
+      select {
+      case <-ctx.Done():
+        return
+      case out <- n:
+      }
+    }
+  }()
+  return out
 }
 
 // Stage 2: 求平方
 func sq(ctx context.Context, in <-chan int) <-chan int {
- out := make(chan int)
- go func() {
-  defer close(out)
-  for n := range in {
-   select {
-   case <-ctx.Done():
-    return
-   case out <- n * n:
-   }
-  }
- }()
- return out
+  out := make(chan int)
+  go func() {
+    defer close(out)
+    for n := range in {
+      select {
+      case <-ctx.Done():
+        return
+      case out <- n * n:
+      }
+    }
+  }()
+  return out
 }
 
 // Stage 3: 数字转换成string
 func toString(ctx context.Context, in <-chan int) <-chan string {
- out := make(chan string)
- go func() {
-  defer close(out)
-  for n := range in {
-   select {
-   case <-ctx.Done():
-    return
-   case out <- fmt.Sprintf("Result: %d", n):
-   }
-  }
- }()
- return out
+  out := make(chan string)
+  go func() {
+    defer close(out)
+    for n := range in {
+      select {
+      case <-ctx.Done():
+        return
+      case out <- fmt.Sprintf("Result: %d", n):
+      }
+    }
+  }()
+  return out
 }
 
 func main() {
- ctx, cancel := context.WithCancel(context.Background())
- defer cancel()
+  ctx, cancel := context.WithCancel(context.Background())
+  defer cancel()
 
- numbers := gen(ctx, 2, 3, 4, 5)
- squares := sq(ctx, numbers)
- results := toString(ctx, squares)
+  numbers := gen(ctx, 2, 3, 4, 5)
+  squares := sq(ctx, numbers)
+  results := toString(ctx, squares)
 
- for r := range results {
-  fmt.Println(r)
-  // 额外控制条件, 如果结果为9, 则停止流水线
-  if r == "Result: 9" {
-   cancel()
+  for r := range results {
+    fmt.Println(r)
+    // 额外控制条件, 如果结果为9, 则停止流水线
+    if r == "Result: 9" {
+      cancel()
+    }
   }
- }
 }
 
 ```
@@ -379,110 +384,112 @@ func main() {
 
 ```{code} go
 :linenos:
+:filename: fan_out.go
+:emphasize-lines: 52
 
 package main
 
 import (
- "context"
- "fmt"
- "sync"
- "time"
+  "context"
+  "fmt"
+  "sync"
+  "time"
 )
 
 // Stage 1: 输出nums中的数字
 func gen(ctx context.Context, nums ...int) <-chan int {
- out := make(chan int)
- go func() {
-  defer close(out)
-  for _, n := range nums {
-   select {
-   case <-ctx.Done():
-    return
-   case out <- n:
-   }
-  }
- }()
- return out
+  out := make(chan int)
+  go func() {
+    defer close(out)
+    for _, n := range nums {
+      select {
+      case <-ctx.Done():
+        return
+      case out <- n:
+      }
+    }
+  }()
+  return out
 }
 
 // 定义做平方的worker
 func sqWorker(ctx context.Context, in <-chan int) <-chan int {
- out := make(chan int)
- go func() {
-  defer close(out)
-  for n := range in {
-   select {
-   case <-ctx.Done():
-    return
-   case out <- n * n:
-    // 模拟真实场景, 让worker做完一个计算就挂起一段时间
-    time.Sleep(100 * time.Millisecond)
-   }
-  }
- }()
- return out
+  out := make(chan int)
+  go func() {
+    defer close(out)
+    for n := range in {
+      select {
+      case <-ctx.Done():
+        return
+      case out <- n * n:
+        // 模拟真实场景, 让worker做完一个计算就挂起一段时间
+        time.Sleep(100 * time.Millisecond)
+      }
+    }
+  }()
+  return out
 }
 
 // Stage 2: fan-out, 把stage1的随机数给到多个sqWorker, 他们彼此独立工作, 最终(无序的)输出所有结果
 func sq(ctx context.Context, in <-chan int, workerCount int) <-chan int {
- out := make(chan int)
- var wg sync.WaitGroup
- wg.Add(workerCount)
+  out := make(chan int)
+  var wg sync.WaitGroup
+  wg.Add(workerCount)
 
- // 创建多个sq goroutine
- for i := 0; i < workerCount; i++ {
-  workerOut := sqWorker(ctx, in)  // 多个goroutine从同一个in channel中读取数据
-  
-  // 将结果转发到out channel
+  // 创建多个sq goroutine
+  for i := 0; i < workerCount; i++ {
+    workerOut := sqWorker(ctx, in) // 多个goroutine从同一个in channel中读取数据
+
+    // 将结果转发到out channel
+    go func() {
+      defer wg.Done()
+      for n := range workerOut {
+        select {
+        case <-ctx.Done():
+          return
+        case out <- n:
+        }
+      }
+    }()
+  }
+
+  // 当所有worker完成工作后关闭out
   go func() {
-   defer wg.Done()
-   for n := range workerOut {
-    select {
-    case <-ctx.Done():
-     return
-    case out <- n:
-    }
-   }
+    wg.Wait()
+    close(out)
   }()
- }
 
- // 当所有worker完成工作后关闭out
- go func() {
-  wg.Wait()
-  close(out)
- }()
-
- return out
+  return out
 }
 
 // Stage 3: 转换成字符串
 func toString(ctx context.Context, in <-chan int) <-chan string {
- out := make(chan string)
- go func() {
-  defer close(out)
-  for n := range in {
-   select {
-   case <-ctx.Done():
-    return
-   case out <- fmt.Sprintf("Result: %d", n):
-   }
-  }
- }()
- return out
+  out := make(chan string)
+  go func() {
+    defer close(out)
+    for n := range in {
+      select {
+      case <-ctx.Done():
+        return
+      case out <- fmt.Sprintf("Result: %d", n):
+      }
+    }
+  }()
+  return out
 }
 
 func main() {
- ctx, cancel := context.WithCancel(context.Background())
- defer cancel()
+  ctx, cancel := context.WithCancel(context.Background())
+  defer cancel()
 
- numbers := gen(ctx, 2, 3, 4, 5, 6, 7, 8)
- // Fan-out with 3 workers
- squares := sq(ctx, numbers, 3)
- results := toString(ctx, squares)
+  numbers := gen(ctx, 2, 3, 4, 5, 6, 7, 8)
+  // Fan-out with 3 workers
+  squares := sq(ctx, numbers, 3)
+  results := toString(ctx, squares)
 
- for r := range results {
-  fmt.Println(r)
- }
+  for r := range results {
+    fmt.Println(r)
+  }
 }
 
 ```
@@ -493,36 +500,38 @@ func main() {
 
 ```{code} go
 :linenos:
+:filename: fan_in.go
+:emphasize-lines: 7-16, 21
 
 // 这里fan-in和fan-out一样, 都是pipeline其中的一环
 // Fan-in: 聚合多个channel的结果
 func fanIn(ctx context.Context, chans ...<-chan int) <-chan int {
- var wg sync.WaitGroup
- out := make(chan int)
+  var wg sync.WaitGroup
+  out := make(chan int)
 
- output := func(c <-chan int) {
-  defer wg.Done()
-  for n := range c {
-   select {
-   case <-ctx.Done():
-    return
-   case out <- n:  // 由c转发到out
-   }
+  output := func(c <-chan int) {
+    defer wg.Done()
+    for n := range c {
+      select {
+      case <-ctx.Done():
+        return
+      case out <- n: // 由c转发到out
+      }
+    }
   }
- }
 
- wg.Add(len(chans))
- for _, c := range chans {
-  // 对每个channel都启动一个转发用的goroutine
-  go output(c)
- }
+  wg.Add(len(chans))
+  for _, c := range chans {
+    // 对每个channel都启动一个转发用的goroutine
+    go output(c)
+  }
 
- go func() {
-  wg.Wait()
-  close(out)
- }()
+  go func() {
+    wg.Wait()
+    close(out)
+  }()
 
- return out
+  return out
 }
 ```
 
@@ -534,13 +543,17 @@ func fanIn(ctx context.Context, chans ...<-chan int) <-chan int {
 第二种应用涉及goroutine之间的管理。例如，总有一些goroutine会因各种原因报错并关闭，此时需要一个supervisor goroutine来管理其他worker goroutine，监听它们是否存活。如果失活，则由supervisor重启这些worker。  
 
 ```{code} go
+:linenos:
+:filename: supervisor.go
+:emphasize-lines: 35-41, 96-107
+
 package main
 
 import (
- "context"
- "fmt"
- "sync"
- "time"
+  "context"
+  "fmt"
+  "sync"
+  "time"
 )
 
 // Worker模拟一个工作goroutine，定期发送心跳。
@@ -549,111 +562,111 @@ func worker(
   ctx context.Context,
   id int,
   heartbeatInterval time.Duration,
-  heartbeat chan<- int
+  heartbeat chan<- int,
 ) {
- defer fmt.Printf("Worker %d 停止了\n", id)
- ticker := time.NewTicker(heartbeatInterval)
- defer ticker.Stop()
+  defer fmt.Printf("Worker %d 停止了\n", id)
+  ticker := time.NewTicker(heartbeatInterval)
+  defer ticker.Stop()
 
- // 模拟工作goroutine在一段时间后死亡
- deathTimer := time.NewTimer(5 * time.Second)
- defer deathTimer.Stop()
+  // 模拟工作goroutine在一段时间后死亡
+  deathTimer := time.NewTimer(5 * time.Second)
+  defer deathTimer.Stop()
 
- for {
-  select {
-  case <-ctx.Done():
-   return
-  case <-deathTimer.C:
-   // 工作goroutine“死亡”，通过返回停止发送心跳
-   fmt.Printf("Worker %d 死亡了\n", id)
-   return
-  case <-ticker.C:
-   select {
-   case heartbeat <- id:
-    // 发送心跳
-   case <-ctx.Done():
-    return
-   default:  // 即使没有supervisor在监听心跳, 也不应该阻塞整个工作goroutine, 所有增加default
-   }
+  for {
+    select {
+    case <-ctx.Done():
+      return
+    case <-deathTimer.C:
+      // 工作goroutine“死亡”，通过返回停止发送心跳
+      fmt.Printf("Worker %d 死亡了\n", id)
+      return
+    case <-ticker.C:
+      select {
+      case heartbeat <- id:
+        // 发送心跳
+      case <-ctx.Done():
+        return
+      default: // 即使没有supervisor在监听心跳, 也不应该阻塞整个工作goroutine, 所有增加default
+      }
+    }
   }
- }
 }
 
 // Supervisor监听工作goroutine的心跳，如果某个工作goroutine停止发送心跳，则重启它。
 func supervisor(
   ctx context.Context,
   workerCount int,
-  heartbeatInterval time.Duration
+  heartbeatInterval time.Duration,
 ) {
- heartbeat := make(chan int)
- var wg sync.WaitGroup
+  heartbeat := make(chan int)
+  var wg sync.WaitGroup
 
- // 启动工作goroutine
- startWorker := func(id int) context.CancelFunc {
-  workerCtx, cancel := context.WithCancel(ctx)
-  wg.Add(1)
-  go func() {
-   defer wg.Done()
-   worker(workerCtx, id, heartbeatInterval, heartbeat)
-  }()
-  return cancel
- }
-
- // 记录取消函数以便重启工作goroutine
- cancelFuncs := make(map[int]context.CancelFunc)
- for i := 1; i <= workerCount; i++ {
-  cancelFuncs[i] = startWorker(i)
- }
-
- // 记录每个工作goroutine最后一次心跳时间
- lastHeartbeat := make(map[int]time.Time)
- for i := 1; i <= workerCount; i++ {
-  lastHeartbeat[i] = time.Now()
- }
-
- checkInterval := heartbeatInterval * 2
- ticker := time.NewTicker(checkInterval)
- defer ticker.Stop()
-
- for {
-  select {
-  case <-ctx.Done():
-   // 取消所有工作goroutine
-   for _, cancel := range cancelFuncs {
-    cancel()
-   }
-   wg.Wait()
-   fmt.Println("Supervisor 停止了")
-   return
-  case id := <-heartbeat:
-   // 更新最后一次心跳时间
-   lastHeartbeat[id] = time.Now()
-   fmt.Printf("Supervisor: 收到来自工作goroutine %d 的心跳\n", id)
-  case <-ticker.C:
-   // 检查哪些工作goroutine错过了心跳
-   now := time.Now()
-   for id, last := range lastHeartbeat {
-    if now.Sub(last) > checkInterval {
-     fmt.Printf("Supervisor: 工作goroutine %d 未收到心跳，正在重启\n", id)
-     // 取消旧工作goroutine并启动新工作goroutine
-     cancelFuncs[id]() // 取消旧的
-     cancelFuncs[id] = startWorker(id)
-     lastHeartbeat[id] = time.Now() // 重置重启后心跳时间
-    }
-   }
+  // 启动工作goroutine
+  startWorker := func(id int) context.CancelFunc {
+    workerCtx, cancel := context.WithCancel(ctx)
+    wg.Add(1)
+    go func() {
+      defer wg.Done()
+      worker(workerCtx, id, heartbeatInterval, heartbeat)
+    }()
+    return cancel
   }
- }
+
+  // 记录取消函数以便重启工作goroutine
+  cancelFuncs := make(map[int]context.CancelFunc)
+  for i := 1; i <= workerCount; i++ {
+    cancelFuncs[i] = startWorker(i)
+  }
+
+  // 记录每个工作goroutine最后一次心跳时间
+  lastHeartbeat := make(map[int]time.Time)
+  for i := 1; i <= workerCount; i++ {
+    lastHeartbeat[i] = time.Now()
+  }
+
+  checkInterval := heartbeatInterval * 2
+  ticker := time.NewTicker(checkInterval)
+  defer ticker.Stop()
+
+  for {
+    select {
+    case <-ctx.Done():
+      // 取消所有工作goroutine
+      for _, cancel := range cancelFuncs {
+        cancel()
+      }
+      wg.Wait()
+      fmt.Println("Supervisor 停止了")
+      return
+    case id := <-heartbeat:
+      // 更新最后一次心跳时间
+      lastHeartbeat[id] = time.Now()
+      fmt.Printf("Supervisor: 收到来自工作goroutine %d 的心跳\n", id)
+    case <-ticker.C:
+      // 检查哪些工作goroutine错过了心跳
+      now := time.Now()
+      for id, last := range lastHeartbeat {
+        if now.Sub(last) > checkInterval {
+          fmt.Printf("Supervisor: 工作goroutine %d 未收到心跳，正在重启\n", id)
+          // 取消旧工作goroutine并启动新工作goroutine
+          cancelFuncs[id]() // 取消旧的
+          cancelFuncs[id] = startWorker(id)
+          lastHeartbeat[id] = time.Now() // 重置重启后心跳时间
+        }
+      }
+    }
+  }
 }
 
 func main() {
- ctx, cancel := context.WithCancel(context.Background())
- defer cancel()
+  ctx, cancel := context.WithCancel(context.Background())
+  defer cancel()
 
- go supervisor(ctx, 3, 1*time.Second)
+  go supervisor(ctx, 3, 1*time.Second)
 
- // 让程序运行15秒
- time.Sleep(15 * time.Second)
- fmt.Println("主程序: 停止运行")
+  // 让程序运行15秒
+  time.Sleep(15 * time.Second)
+  fmt.Println("主程序: 停止运行")
 }
 ```
 

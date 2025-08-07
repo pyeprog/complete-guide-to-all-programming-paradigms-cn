@@ -19,6 +19,7 @@ async 在语言中引入两个核心概念：
 ::::{tab-item} javascript
 ```{code} javascript
 :linenos:
+:emphasize-lines: 2,3
 
 async function fetchData(url) {
   const response = await fetch(url);
@@ -32,6 +33,7 @@ fetchData('https://example.com');
 ::::{tab-item} python
 ```{code} python
 :linenos:
+:emphasize-lines: 5-7
 
 import asyncio
 import aiohttp
@@ -48,10 +50,12 @@ asyncio.run(fetch_data('https://example.com'))
 ::::
 
 ::::{tab-item} rust
+
 ```{code} rust
 :linenos:
+:emphasize-lines: 5,6
 
-se async_std::task;
+use async_std::task;
 use surf;
 
 async fn fetch_data(url: &str) -> Result<(), surf::Exception> {

@@ -77,6 +77,7 @@
 ```{code} java
 :linenos:
 :caption: java中, 如果临界区中的代码有可能报错退出, 我们需要catch错误, 并在final中进行unlock
+:emphasize-lines: 5,8,12,13
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -102,6 +103,7 @@ public class SimpleExplicitLock {
 ```{code} go
 :linenos:
 :caption: golang中提供了defer关键词, 可以在函数正常或异常退出时执行unlock操作
+:emphasize-lines: 9,12,13,20,21
 
 package main
 
@@ -136,6 +138,7 @@ func Decrement() {
 ```{code} cpp
 :linenos:
 :caption: c++11提供的lock_guard和scoped_lock, 在退出当前scope的时候自动执行unlock. (RAII风格)
+:emphasize-lines: 5,13
 
 #include <mutex>
 
@@ -172,6 +175,7 @@ lock非常的简单, 但是同时也存在一些硬伤.
 ::::{tab-item} java中的reentrant lock
 ```{code} java
 :linenos:
+:emphasize-lines: 11,20,25
 
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -215,6 +219,7 @@ public class ReentrantLockExample {
 
 ```{code} cpp
 :linenos:
+:emphasize-lines: 5,9
 
 #include <iostream>
 #include <mutex>
@@ -245,6 +250,7 @@ int main() {
 
 ```{code} oz
 :linenos:
+:emphasize-lines: 6
 
 fun {NewLock}
   Token = {NewCell unit}
@@ -284,6 +290,8 @@ end
 
 ```{code} java
 :linenos:
+:filename: reentrantLockExample.java
+:emphasize-lines: 16,19,24,27,32,35
 
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -341,6 +349,7 @@ public class BookInfo {
 :linenos:
 :filename: acquiring_in_order.py
 :caption: 按照固定顺序获取锁，这是最简单的方式
+:emphasize-lines: 8,14
 
 import threading
 
@@ -384,6 +393,7 @@ t2.join()
 :linenos:
 :filename: acquiring_at_once.cpp
 :caption: 一次性尝试获取所有锁（try_lock），如果有任一锁获取失败，则释放已获取的锁并重新尝试，这样可以保证一次性获取所有锁
+:emphasize-lines: 36-51
 
 #include <iostream>
 #include <thread>
@@ -473,6 +483,7 @@ int main() {
 :linenos:
 :filename: timeout_lock.cpp
 :caption: 为锁设置过期时间，超时后自动释放锁
+:emphasize-lines: 29
 
 #include <iostream>
 #include <thread>
@@ -567,6 +578,7 @@ int main() {
 :linenos:
 :filename: preemptable_lock.py
 :caption: 使锁支持抢占机制，引入优先级概念。当高优先级线程申请锁时，持有锁的低优先级线程会报错并释放锁
+:emphasize-lines: 21-28,34,35
 
 import threading
 import time
@@ -690,6 +702,8 @@ SET resource my_unique_id NX PX 30000
 
 ```{code} cpp
 :linenos:
+:filename: lock_free_stack.cpp
+:emphasize-lines: 15-25
 
 struct Node {
   Node* next;
@@ -735,6 +749,7 @@ Node* pop(Stack* s) {
 
 ```{code} python
 :linenos:
+:emphasize-lines: 2-4
 
 while true:
     origin_value = value
@@ -765,6 +780,9 @@ condition variable臭名昭著，这个概念难以理解。
 原则上，使用condition variable的场景是在多个线程基于`同一组共享变量是否满足某种条件`来决定自身是挂起还是继续运行。  
 
 ```{code} java
+:linenos:
+:filename: coordinate.java
+:emphasize-lines: 6-8,13,17,22,24,29,33,38,41
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;

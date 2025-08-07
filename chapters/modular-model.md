@@ -1,155 +1,566 @@
-# Modular Model & Modular Programming
+# Modular Model和模块化编程
 
-![[Think 2025-06-22 22.22.50.excalidraw]]
-modular model是一个公认的好模型, 它几乎算是工程标配. 除了古早的语言和极少数现代语言之外(c/c++), 几乎所有的语言都支持modular programming. 有些语言甚至强制按module组织项目.
+{abbr}`Modular model(模块化编程模型)`几乎成为工程的标配，是为数不多被**广泛认可**的模型.\
+除了一些较早的语言和{abbr}`极少数现代语言(如C/C++)`之外，几乎所有语言都支持模块化编程。{abbr}`有些语言(譬如rust)`甚至强制要求按模块组织项目结构。
 
 ## Modular Model带来的新特性
 
-这个模型增加两个新特性.
-首先它定义了module的概念. module是一个容器, 我们可以把相关的一组常量, 函数, 类型定义(包括struct和enum), 以及后面会提到的类放在同一个容器之中, 在取用的时候需要在前面指定“module名字.”, 代表你调用的是module中的内容. 如此一来, 所有常量, 函数, 类型和类等元素都有了归属, 不再存在同名函数冲突的问题. (当然如果module名字冲突仍然存在). 另外, 所有的大模块内部也可以继续拆分成若干小模块, 如此层层拆分形成模块树, 最终叶子模块只承载必要的一小部份元素, 变得短小精干.
+这个模型增加了两个新特性: `模块封装`和`访问控制`.
 
-另一个特性是元素会被指定是否对外部可见. 绝大部份语言都提供约束可见性的关键词, 譬如标记可见的public / export / pub, 或者标记不可见(私有)的private, defp等等. 有些语言不支持强硬的可见性约束, 但在这些语言的编程惯例中使用特殊命名来表明是否私有, 譬如python中函数名以下划线开头代表私有, 不推荐外部引用.
+首先，它引入了{abbr}`module(模块)`的概念。`module是一个容器`，我们可以将相关的一组常量、函数、类型定义(包括 struct 和 enum)，以及后续将提及的类，放在同一个容器中。调用时需要在前面指定`<module-name>.`，表示调用的是该 module 中的内容。这样一来，所有常量、函数、类型和类等元素都有了归属，`避免了同名函数冲突的问题`（当然，如果 module 名称冲突仍然存在）。此外，大模块内部还可以继续拆分成若干小模块，层层拆分形成`模块树`，最终叶子模块只承载必要的一小部分元素，变得`简洁精炼`.
 
-这两个特性看起来简单, 实则效用巨大.
-![[Think 2025-06-17 14.56.32.excalidraw]]
+另一个特性是元素的访问控制。绝大多数语言都提供相关关键词，例如标记为可访问(公有)的`public / export / pub`，或标记为不可访问(私有)的 `private / defp` 等等。有些语言不支持强制的访问控制，但在实践中通过特殊命名表明该元素是否是"私有的"，如python中以下划线开头的函数名表示私有，不推荐外部引用。  
+
+这两个特性看似简单，实则作用巨大。  
+
+### 接口定义
+
+模块提供了访问控制, 通过{abbr}`隐藏(置为私有)`外接无序了解的元素, 来强调真正重要的, 逻辑单元之间交互必须使用的{abbr}`元素(常量, 函数, 方法, 类型, 类等等)`, 从而大大简化逻辑单元之间交互的复杂性. 这种实践是[迪米特法则](https://en.wikipedia.org/wiki/Law_of_Demeter)的一种实践.
+
+:::::{tab-set}
+
+::::{tab-item} 使用module
+```{code} cpp
+:linenos:
+:caption: 通过module{abbr}`暴露(置为公有)`的少量方法能快速了解代码的意图, 这里module用来访问API
+// 暴露少量方法
+fetch(Api) -> Data
+toString(Data) -> String
+```
+::::
+
+::::{tab-item} 不使用module
+```{code} cpp
+:linenos:
+:caption: 当所有方法都公有时, 难以快速了解作者意图, 难以快速选出主要方法
+
+// 暴露全部方法
+isValid(Api) -> bool
+host(Api) -> String
+path(Api) -> String
+resolveHost(string) -> Ip
+request(Ip, String) -> Data
+toString(Data) -> String
+fetch(Api) -> Data
+```
+::::
+
+:::::
+
+### 代码组织
+
+模块提供了一种代码组织规范, `属于同一个模块的元素, 应该聚合在同一个文件或同一个路径下`(物理距离接近). 这种组织规范能大大简化代码组织和管理.
+
+:::::{tab-set}
+
+::::{tab-item} 使用module
+```{code} text
+:caption: 代码组织一目了然, 很容易快速定位, 每个文件名都简短精干
+
+leaf_engine/
+├── Cargo.toml
+├── .gitignore
+├── src/
+│   ├── main.rs
+│   ├── app/
+│   │   └── mod.rs
+│   ├── asset/
+│   │   ├── loader.rs
+│   │   ├── texture.rs
+│   │   └── model.rs
+│   ├── audio/
+│   │   ├── source.rs
+│   │   └── listener.rs
+│   ├── ecs/
+│   │   ├── world.rs
+│   │   ├── system.rs
+│   │   └── component.rs
+│   ├── input/
+│   │   ├── keyboard.rs
+│   │   ├── mouse.rs
+│   │   └── gamepad.rs
+│   ├── physics/
+│   │   ├── rigid_body.rs
+│   │   ├── collision.rs
+│   │   └── world.rs
+│   ├── rendering/
+│   │   ├── pipeline.rs
+│   │   ├── mesh.rs
+│   │   ├── shader.rs
+│   │   ├── material.rs
+│   │   └── renderer.rs
+│   ├── scene/
+│   │   ├── node.rs
+│   │   ├── transform.rs
+│   │   └── graph.rs
+│   └── utils/
+│       ├── math.rs
+│       ├── logging.rs
+│       └── timer.rs
+└── tests/
+    ├── unit/
+    │   ├── physics.rs
+    │   └── rendering.rs
+    └── integration/
+        ├── scene.rs
+        └── game_loop.rs
+```
+::::
+
+::::{tab-item} 不使用module
+```{code} text
+:caption: 所有源文件堆积在一起, 难以快速定位, 每个文件名都相对冗长
+
+leaf_engine/
+├── Cargo.toml
+├── .gitignore
+├── main.rs
+├── app_mod.rs
+├── asset_loader.rs
+├── asset_texture.rs
+├── asset_model.rs
+├── audio_source.rs
+├── audio_listener.rs
+├── ecs_world.rs
+├── ecs_system.rs
+├── ecs_component.rs
+├── input_keyboard.rs
+├── input_mouse.rs
+├── input_gamepad.rs
+├── physics_rigid_body.rs
+├── physics_collision.rs
+├── physics_world.rs
+├── rendering_pipeline.rs
+├── rendering_mesh.rs
+├── rendering_shader.rs
+├── rendering_material.rs
+├── rendering_renderer.rs
+├── scene_node.rs
+├── scene_transform.rs
+├── scene_graph.rs
+├── utils_math.rs
+├── utils_logging.rs
+├── utils_timer.rs
+└── tests/
+    ├── unit_physics.rs
+    ├── unit_rendering.rs
+    ├── integration_scene.rs
+    └── integration_game_loop.rs
+```
+::::
+
+:::::
+
 
 ## Modular Model能够约束系统复杂度
 
-modular programming是约束系统复杂度的必要手段.
-首先系统职责被切分给来若干个子模块, 小模块更简单, 更容易被实现, 也更容易复用. 另外, 我们隐藏大部份的元素, 只暴露少量的类型, 函数, 类等元素给外界, 这本质上定义了模块的接口. 其他模块只能调用这些接口元素, 这让模块之间的交互变得简单. 修改代码时, 只要接口不变, 修改模块中的代码, 外界不会有任何感知.
+`组织模块是约束系统复杂度的必要手段`。
 
-通过使用modular model, 我们可以尽可能减少系统的整体复杂度. 系统的整体复杂度是互相交互的每个模块复杂度的乘积, 而每个模块的复杂度是其接口的复杂度. 模块之间交互的接口越简洁, 系统整体复杂度越低.
-既然如此, 我把整个系统写成一个大模块, 没有模块之间的交互, 岂不是复杂度最低?
-并不是, 同时混合了多个职责的模块, 其实内部暗含了好几个子模块, 如果不用模块去约束他们, 就相当于他们暴露了自己全部的元素, 这样的复杂度反而高.
-![[Think 2025-06-07 11.54.13.excalidraw]]
+首先，`系统职责被划分为若干子模块，较小的模块更为简单，易于实现且便于复用`。此外，我们隐藏大部分元素，仅向外界暴露少量类型、函数、类等元素，本质上这构成了模块的接口。其他模块只能`调用这些接口元素，从而简化了模块之间的交互`。`修改代码时，只要接口保持不变，模块内部的修改不会被外界察觉`。
 
-在不同的语言中, module的叫法有所不同, 有些语言称为module(有些简写成mod), 另一些语言中称为package(譬如java). 不同语言中定义module的方式也有所不同.
+通过采用模块化模型，我们能够尽量降低系统的整体复杂度。
+
+系统的整体复杂度是各个相互交互模块复杂度的乘积，而每个模块的复杂度则取决于其接口的复杂度。模块间交互接口越简洁，系统整体复杂度越低。
+
+::::{caution} 将整个系统写成一个大模块，没有模块间交互，岂不是复杂度最低?
+:::{figure} ../material/big-mod-low-complexity.png
+事实并非如此。一个同时承担多重职责的模块，实际上隐含多个子模块.\
+`若不通过模块约束它们，相当于暴露了所有元素，反而增加了交互复杂度`。
+:::
+::::
+
 
 ## 不同语言中定义模块的风格对比
 
-定义模块和引用模块是语言中非常重要的一环, 他和编译器或解释器如何寻找源文件, 如何组织编译成品(object, bytecode等等), 如何解析对模块的引用息息相关.
+在不同编程语言中，module的称谓有所不同。有些语言称之为{abbr}`module(有时简写为mod)`，另一些语言则称为{abbr}`package(如Java等)`。不同语言中定义module的方式也存在差异。
+
+定义模块和引用模块是语言中非常重要的一环, 他和编译器或解释器如何寻找源文件, 如何组织{abbr}`编译成品(Object, Bytecode等等)`, 如何解析对模块的引用息息相关.
 ![[Think 2025-07-16 19.56.46.excalidraw]]
 
-一般而言, 有两种风格区别. 隐式定义和显示定义. 我们一一介绍.
+一般而言模块系统有2种风格: `隐式定义`和`显示定义`.
 
 ### 隐式风格
 
-隐式定义会把每个源文件作为一个module, 譬如`user.rs`, 就对应user这个module. `drawer/mod.rs`是一个特殊的文件, 对应drawer这个module. 在这种风格之下, 很多语言都还支持在单个文件中定义sub module. 譬如在rust中, 有个文件`a.rs`, 其中有`mod sub`, 我们就是在a中定义了sub这个子模块.
-这种风格之下, 源文件怎么组织, module就怎么定义. 是最直观最好理解的风格.
-使用的时候通过类似于`import a.b`这样的语句, 编译器或解释器就会去寻找`a/b.xx`或`a/b/mod.xx`的源文件.
+`隐式定义会将每个源文件或文件路径视为一个module`. 因为代码中无显式模块定义, 所以我们称其为隐式风格.\
+
+:::{figure} ../material/implicit-def.png
+以rust为例子, 例如`user.rs`对应`user`这个module，`drawer/mod.rs`是一个特殊文件，对应`drawer`这个module。
+我们还可以在main中定义<span style="color:green">sub</span>这个子模块.
+:::
+
+在这种风格下，许多语言还支持在单个文件中定义子模块。譬如以下例子.
+
+```{code} rust
+:linenos:
+:filename: tool.rs
+:caption: 这里math_utils就是定义在tool这个module下的子模块
+
+mod math_utils {
+    pub const PI: f64 = 3.14159;
+
+    pub fn add(a: i32, b: i32) -> i32 {
+        a + b
+    }
+
+    fn subtract(a: i32, b: i32) -> i32 {
+        a - b
+    }
+
+    pub struct Point {
+        pub x: f64,
+        pub y: f64,
+    }
+
+    pub enum Operation {
+        Add,
+        Subtract,
+    }
+}
+```
+
+`这种风格使源文件的组织即是模块的定义，直观且易于理解`。使用时，通过类似`import a.b`的语句，编译器或解释器会去寻找对应的源文件，如`a/b.x`或`a/b/mod.x`。
 
 ### 显示风格
 
-显示定义需要在源文件中指定module的定义. module结构和文件结构并没有直接的关系. 你可以在6个源文件中定义3个module, 或者反过来3个源文件定义6个module. 这里module是逻辑上的module, 跟文件和文件结构都没有关系. 这是个大前提. 所以你想怎么组织module和怎么组织代码结构, 两者并不一定一一对应, 就算不对应, 也能够正确编译或执行. 不过基本所有语言代码范式都要求, 两者最好一一对应.
+`显示定义需要在源文件中指定module的定义, module结构和文件结构并没有直接的关系`. 
 
-显示定义有两种风格, wrapper和tag.
-wrapper会定义一个代码块, 然后把内容包在里面. tag会在源文件开头打上`package <name>`表明该源文件属于哪个module.
-无论是哪种风格, module只存在于编译后的可执行文件或字节码中, 而跟代码没有一一对应关系. 使用的时候通过`import a.b`这样的语句, 编译器或解释器会从编译后的可执行文件或字节码中找到相应的module.
+你可以在M个源文件中定义N个module. 这里module是逻辑上的module, 跟文件和文件结构都没有关系, 两者并不需要一一对应, 因为就算不对应也能够正确编译执行.
+
+:::{figure} ../material/explicit-def.png
+- <span style="color:blue">[左] java项目的文件目录</span>
+- <span style="color:green">[右] elixir项目的文件目录</span>
+- 假设两者有相同的模块定义, 即使两者的文件组织结构相差很多, 经过编译, <span style="color:red">两者都能形成相同的模块结构[中]</span>
+:::
+
+:::{admonition} 虽然源文件和模块结构彼此独立
+但几乎所有语言的`代码范式都要求文件和模块的组织一一对应`.
+:::
+
+显示风格下有两种具体写法, 分别是: `wrapper`和`tag`.
+
+::::{tab-set}
+
+:::{tab-item} wrapper
+```{code} exlixir
+:linenos:
+:emphasize-lines: 1-5
+:filename: wrapper.ex
+:caption: wrapper会定义一个代码块, 然后把内容包在里面. 
+
+defmodule Greeter do
+  def say_hello(name) do
+    "Hello, #{name}!"
+  end
+end
+
+# Usage example:
+IO.puts Greeter.say_hello("Alice")
+```
+:::
+
+:::{tab-item} tag
+```{code} go
+:linenos:
+:emphasize-lines: 1
+:filename: example/greeter.go
+:label: go-mod
+:caption: tag会在源文件开头打上`package <name>`表明该源文件属于哪个module.
+
+package greeter
+
+import "fmt"
+
+func SayHello(name string) string {
+    return fmt.Sprintf("Hello, %s!", name)
+}
+```
+
+```{code} go
+:linenos:
+:filename: example/main.go
+:label: go-import
+:emphasize-lines: 5,9,10
+
+package main
+
+import (
+    "fmt"
+    "example/greeter" // 这里指定的是文件路径
+)
+
+func main() {
+	// 这里的greeter是module名, go强烈建议文件名和module名一一对应
+    message := greeter.SayHello("Alice")
+    fmt.Println(message)
+}
+```
+:::
+
+::::
+
+无论是哪种写法, `显式风格下, module只存在于编译后的可执行文件或字节码中, 而跟代码没有一一对应关系`. 使用的时候通过`import a.b`这样的语句, 编译器或解释器会`从编译后的可执行文件或字节码中找到相应的module`.
 
 ### 构建大型项目
 
-为什么要提及模块定义这件小事呢? 因为它和项目构建息息相关.
-你会发现有些大型项目构建很麻烦, 需要复杂的构建工具, 还要写很多相关配置文件, 譬如说java系的maven, gradle, scala中的sbt, elixir中的mix等等.
-而另一些大型项目构建就很容易, 基本就是原生编译器或解释器一句简单的命令搞定, 譬如很多脚本语言只需要执行入口文件即可.
+为什么要提及模块定义这件“小事”呢？因为`它与项目构建息息相关`。
 
-通常构建项目简单的都是隐式风格的语言, 而麻烦的基本是显示风格. 为什么? 因为构建项目首先需要寻找源文件.
-隐式风格源文件和模块息息相关. 我们只需要解析入口文件引用了什么模块, 就能够去找到对应的源文件, 然后在这些原文件中重复刚才的过程, 依此类推就能找到所有的源文件.
+:::{important} 为什么?
+你会发现，有些大型项目的构建非常复杂，需要`依赖繁琐的构建工具和大量配置文件`，比如Java体系的Maven、Gradle，Scala中的SBT，Elixir中的Mix等。\
+而另一些大型项目构建则非常简单，基本上只需`原生编译器或解释器执行一句简单命令即可完成`，比如python, ruby等语言只需用解释器运行入口文件。
+:::
 
-而显示定义中编译器或解释器并不知道怎么找到源文件. 所以一般需要手动给定一堆源文件, 或者直接用工具把整个路径下所有的源文件全部扒出来, 至于你怎么组织这些文件, 是怎样的嵌套文件夹, 都没有关系, 结果都一样. 编译器在编译完毕后会按照module的定义去组织字节码文件. 这就是为什么这些语言中构建大型项目一般要搭配一个构建工具, 因为手动操作这些步骤很繁琐.
+通常，`构建过程简单的语言多采用隐式模块定义风格`，而`构建过程复杂的语言多为显式定义风格`。其原因在于，构建项目首先需要定位源文件, 而两者定位源文件的机制完全不同。
 
-不过一些显示定义风格的语言采用了另一种巧妙的方法, 在引用模块的时候, 不去`import a.b`而是直接`import "file.path"`, 直接指定模块的源文件路径. 这样一来, 编译器又可以自动解析所有的源文件了. go就是这么做的. 所以编译go mod变得非常简单.
+:::{figure} ../material/implicit-def-fetch-src.png
+在隐式风格中，源文件与模块一一对应，`只需解析入口文件引用的模块，即可找到对应的源文件`，递归此过程便能定位所有源文件。
+:::
 
-### 怎么快速上手
+:::{figure} ../material/explicit-def-fetch-src.png
+显式定义风格中，编译器或解释器并不具备自动定位源文件的能力，通常需要`手动指定大量源文件或借助工具扫描整个路径下的所有源文件`。文件的组织方式和嵌套结构对结果无影响，编译器会根据模块定义来组织字节码文件。这也是为何这类语言在构建大型项目时通常依赖构建工具，因为手动管理这些步骤十分繁琐。
+:::
 
-想要快速上手, 我们需要了解以下几个要点.
-首先, 通过语法, 你能够快速的了解当前的语言支持的是哪种风格的定义. 如果是显示风格的, 那么可以直接搜索语言+toolchain, 或者语言+build tool. 了解如何使用build tool创建项目和构建项目.
+不过，一些显式定义风格的语言采用了巧妙的方案：在引用模块时，不使用`import a.b`，而是直接用`import "file/path"`，明确指定模块的源文件路径, 而不是指定引用模块。\
+如此一来，编译器即可自动解析所有源文件。Go语言正是采用此方式，因此go module的构建非常简便, 见上文中 @go-mod 和 @go-import。
 
-其次, 无论何种风格, 每个项目都会有项目根目录, 显示风格中的build tool会根据从根目录下的某个子目录去搜索源文件. 隐式风格的编译器或者解释器会把入口文件路径默认为根目录, 它会从根目录去寻找对应模块的源文件. 所以在一些特定的情况下, 可能会导致错误, 在这个例子中, 如果我想直接调用deeply.nested.test, 解释器会以deeply.nested作为根目录, 这样一来test中的import会导致找不到module的错误.
+### 怎么快速上手模块系统
 
-最后, 无论什么风格, 最佳实践都是让代码结构和module结构一一对应. 隐式风格强制这一点, 而采纳显示风格的语言则通过范式要求这一点, 而且几乎没有例外.
+想要快速上手，我们需要掌握以下几个要点。
+
+首先，通过语法你可以快速判断当前语言采用的是哪种模块定义风格。
+
+如果是显式风格，可以直接搜索“`语言+toolchain`”或“`语言+build tool`”，了解如何使用构建工具创建和构建项目。隐式风格, 则看看怎编译或运行入口文件.
+
+其次，无论何种风格，每个项目都会有项目`根目录`。
+- 显式风格中的构建工具会从根目录下的某个子目录开始搜索源文件
+- 隐式风格的编译器或解释器则将入口文件所在路径视为根目录，从根目录开始查找对应模块的源文件。
+
+::::{caution} 隐式风格中根目录和模块引用路径需要对应
+:::{figure} ../material/root-error-implicit-def.png
+- <span style="color:green">在/parent/project中运行main.py是正确的</span>
+- <span style="color:red">在/parent/project/deeply/nested中运行test.py则是错误的, 因为test.py中import的写法是以/parent/project为根目录, 而不是/parent/project/deeply/nested.</span>
+:::
+::::
+
+最后，无论何种风格，最佳实践都是让代码结构与模块结构一一对应。隐式风格强制这一点，而采用显式风格的语言则通过范式来要求，且几乎没有例外。
 
 ### 例外
 
-除开古早的语言和冷门的语言, 也有少部份语言目前是不支持module的, 譬如c/c++(c++这个特性未来会有). 另外有一些语言定义了一种完全不同的module体系, 譬如swift, 这里也就不再展开了.
-
-### legacy
-
-ref: [[module syntax in bunch of languages]]
-一般而言有两种定义方式, 隐式定义和显示定义.
-![[Think 2025-06-17 16.28.58.excalidraw]]
-在确定项目的root_path的前提下,
-
-- 隐式定义会把每个源文件当作一个module, 部分语言也支持把文件夹当作module, 只不过需要一点额外的配置或代码, 而文件夹中的源文件则是其子模块. 这种风格下文件和module是一一对应的, 文件组织结构和module的组织结构也是一一对应的, 比较好理解. 编译器或解释器会按照module的组织结构去寻找相应的源文件.
-- 显示定义有两种风格, 一种是wrapper风格, 一种是tag风格.
- 	- wrapper风格使用mod / namespace / defmodule等关键词创建一个scope, 然后把相关的函数, 类, 常量的定义放入其中.
- 	- tag风格一般使用package关键词, 在源文件开始处指定当前文件内容属于哪一个package.
-
-虽然一般支持显示定义module的语言, 都支持module名和文件路径名无关. 但这些语言几乎都有一个惯例是module的命名和文件路径挂钩.
-部分语言同时支持显式和隐式定义.
-
-在引用这些module的时候, 一般都是使用module的绝对路径(或全名), 在少量隐式定义的语言中, 也支持module的相对路径.
-
-不同的module风格, 构建/编译/运行大型项目的难度也不同.
-
-- 隐式定义因为把源文件当做module, module的层级结构完全对应文件结构. 所以采用这样风格的语言, 一般只需要编译或运行入口文件即可. 在解析到其引用的其他module之后, 再去对应路径寻找相应的源文件即可. 这相对而言比较简单.
-- 而显式定义, module结构和文件结构脱开, 所以他们的编译或执行需要指定module结构和文件结构的对应方式, 目前总结有以下几种.
- 	- 第一种, 引用其他module时, 完全放弃module结构, 直接引用具体文件. go, javascript, lua, lisp等语言采用这种机制. 这带来另一个问题, 第三方package怎么引用呢? 通常, package manager会安装package到指定位置, 我们在使用时只需要当做三方package在项目根目录下即可. 这种机制下, 编译时只需要指定入口文件即可.
- 	- 第二种, 强制要求module结构和文件结构一一对应. elixir采用这种机制. 这种机制等于退回隐式定义, 并且徒增了冗余定义, 所以一般很少见.
- 	- 第三种, 在编译器之上, 引入build tool. 一般build tool有很强的规范, 规定项目结构必须是什么样子, 源文件必须放在哪里, 必要时还需要编写配置文件. c, c++使用make或cmake, java中使用maven或gradle, scala中使用sbt, rust中使用cargo, 他们均采用这种机制. 这种机制下, 编译使用build tool, 由它来解析引用, 寻找文件, 匹配文件和module结构.
-
-除开古早的语言和冷门的语言, 也有少部份语言目前是不支持module的, 譬如c/c++(c++这个特性未来会有). 另外有一些语言定义了一种完全不同的module体系, 譬如swift, 这里也就不再展开了.
+除开古早的语言和冷门的语言, 也有少部份语言目前是不支持module的, 譬如c/c++(c++这个特性未来会有). 另外一些语言定义了一种完全不同的module体系, 譬如swift, 这里就不再展开了.
 
 ## Module和object的关系
 
-为什么modular model会和object扯上关系? 我们仔细观察代码式如何使用module的. 我们会发现, module和object在使用上的唯一区别是, module是个单例对象, 而且其中一般没有状态变量, 除此之外module能够进行封装, 并对外提供自己定义的接口. module提供了object功能的子集.
-![[Think 2025-06-17 17.10.17.excalidraw]]
+为什么modular model会和object扯上关系?
+
+如果仔细观察, 我们会发现, module和object在使用上的唯一区别是, module是个单例对象, 而且其中一般没有状态变量, 除此之外module能够进行封装, 并对外提供自己定义的接口. `module提供了object功能的子集`.
+
+:::{figure} ../material/module-class-instance.png
+:width: 100%
+:align: center
+- \[左] <span style="color:red">作为module的stack</span>仅暴露一组无状态函数, 它不会创建实例
+- \[中] <span style="color:green">作为class的stack</span>也仅暴露一组无状态函数, 跟module类似
+- \[右] <span style="color:blue">作为object的stack</span>"{underline}`也可以`"暴露一组方法, 同时在外部管理数据, {underline}`虽然我们一般不会这么用`, object能够提供更加强大的功能
+:::
 
 ## 如何用好module
 
-什么时候使用module呢? 如果没有特殊要求, 最好处处使用, 一直使用,.
+什么时候使用module呢? `如果没有特殊要求, 最好处处使用`.
 
-一般简单的feature用起来门道多, 复杂的feature则正相反. modular model很简单, 只不过是把同类的函数放在一起, 提升内聚, 对外提供定义好的接口, 降低系统复杂度. 但如何用好module是一门学问.
+一般简单的feature用起来门道多, 复杂的feature则正相反. modular model很简单, 只不过是把同类的元素放在一起, 提升内聚, 对外提供定义好的接口, 降低系统复杂度, 但如何用好module是一门学问.
 
 ### Group by Feature VS Group by Subject
 
-首先, 如何整理模块? 把相关的元素整理到模块里, 方法有很多, 最常见的有两种方式. 一种叫"group by subject", 一种叫“group by feature".
-以web server项目为例, 按照java中的命名方式, 一般有model, service, controller这几类对象. model是负责承载数据的类, service负责提供业务逻辑的类, controller负责注册url以及处理请求的具体逻辑.
+首先, 如何整理模块? 
+
+把相关的元素整理到模块里, 方法有很多, 最常见的有两种方式
+
+- `group by subject`: {abbr}`按照元素类别来整理(譬如所有的util整理成一个模块, 所有的controller整理成一个模块)`
+- `group by feature`: {abbr}`按照功能来整理(譬如功能A的数据结构,业务逻辑,util整理成一个模块, 功能B的整理成另一个)`
+
+以web server项目为例, 按照java中的命名方式, 一般有model, service, controller这几类对象. 
+
+- model是负责承载数据的类
+- service负责提供业务逻辑的类
+- controller负责注册url以及处理请求的具体逻辑
+  
 如果服务有两个api, 一共提供User的增删改查, 一个提供Product的增删改查.
-group by subject就是把User和Product的model放在一个模块中, 两者的service放在一个模块中, 两者的controller放在一个模块中, 所有的util/helper放在一个模块中.
-而group by feature则按照不同的feature来组织, User相关的所有内容放在User模块, 其中有User相关的model, service, controller, util, 分别放在相应的子模块. 同理Product.
-![[Think 2025-06-17 17.25.08.excalidraw]]
 
-group by subject适合简单人少的项目, 因为在这种项目中工作并不需要对feature有理解, 也不需要费力去组织模块.
-但是当项目逐渐变大, 人员逐渐变多, group by subject的劣势就非常明显了. 首先model, service, controller等模块混杂了所有业务的代码, 所以这些模块不可能被复用. 第二, 所有业务的service类都放在一起, 难免有人会禁不住诱惑在自己的service中调用别的service, 把本该独立的service耦合起来, 后续要改就非常困难了. 第三, 所有人都需要修改所有模块, 很难分配代码的归属权和责任范围, 这对大团队合作非常不利.
+:::{figure} ../material/mod-grouping-methods.png
+- group by subject就是把User和Product的model放在一个模块中, 两者的service放在一个模块中, 两者的controller放在一个模块中, 所有的util/helper放在一个模块中.
+- group by feature则按照不同的feature来组织, User相关的所有内容放在User模块, 其中有User相关的model, service, controller, util, 分别放在相应的子模块. 同理Product.
+:::
 
-group by feature是业界比较推荐的代码组织方式, 适合长期, 大规模的项目. 但业务在演进, feature本身也在不断改变. 模块组织需要对应业务本身的演进. 所以在业务发生改变的时候, 需要及时重构, 调整模块组织. 否则就会欠下技术债.
+#### 研发职责分配
+
+
+:::::{tab-set}
+
+::::{tab-item} group by subject
+
+:::{caution} 一大波敏捷冲刺后
+假设项目经过几个月的发展, 加入了100个新功能.
+:::
+
+:::{figure} ../material/group-by-sub-conflict.png
+此时每个模块的大小都{underline}`膨胀了数倍`, 每位开发者都需要修改所有的模块才能完成新功能, 代码冲突频繁发生, 代码理解困难, 一个功能的代码散落在不同的模块中
+:::
+
+:::{figure} ../material/ref-to-sibling-mod.png
+在这种模块组织下, 总会有开发者会引用{underline}`"同一模块下"`的{underline}`"兄弟模块"`, 譬如user_service去引用其他service来完成功能🥶.\
+毕竟`引用同一个模块中的子模块, 并没有违反任何原则`, 对吧?\
+对...还真是...
+
+:::{caution} 业务演进后改变了形态
+👨‍🦳老板要求把User模块独立出去, 单独发布
+:::
+
+:::{figure} ../material/bad-ending-group-by-sub.png
+经过漫长且痛苦的依赖梳理后, 终于把User提出来了, 但附带了一堆其他模块的文件. 此时老板开始咆哮:
+
+1. 为什么User模块里需要包含其他模块的service和model??
+2. 这些冗余的service和model怎么管理? 他们是随着User repo升级还是随着原来的repo升级? 谁来管理他们?
+:::
+
+:::{image} ../material/endless-pain.jpg
+:::
+
+::::
+
+::::{tab-item} group by feature
+
+:::{caution} 一大波敏捷冲刺后
+假设项目经过几个月的发展, 加入了100个新功能.
+:::
+
+:::{figure} ../material/group-by-feat-conflict.png
+`模块大小没有改变`, 但是增加了100个新模块. 每个开发者都被分配若干模块进行维护, `代码冲突鲜有发生`, 因为模块小, `理解起来也容易`, 一个功能一个模块.
+:::
+
+:::{caution} 业务演进后改变了形态
+👨‍🦳老板要求把User模块独立出去, 单独发布
+:::
+
+:::{figure} ../material/good-ending-group-by-feat.png
+简单把User模块从原repo中移到新repo中, `几乎不费功夫`, User很干净, 几乎没有除了util和三方库之外的其他依赖.
+:::
+ 
+:::{image} ../material/bravo.jpeg
+:::
+::::
+
+:::::
+
+group by subject适合简单人少的短期项目, 因为在这种项目中工作并不需要对feature有理解, 也不需要费力去组织模块. 但是当项目逐渐变大, 人员逐渐变多, group by subject的劣势就非常明显了. 
+
+`Group by feature是业界比较推荐的代码组织方式, 适合长期, 大规模的项目`. 但业务在演进, feature本身也在不断改变. `模块组织需要对应业务本身的演进`. 所以在业务发生改变的时候, 需要及时重构, 调整模块组织. 否则就会欠下技术债.
 
 ### 如何评价模块质量
 
-其次, 如何评价模块的质量?
-首先, 评价模块的interface的质量
+#### 评价模块的interface的质量
 
-- 是否履行单一职责, 处理同一类或者同一个范畴的问题? 如果不符合单一职责, 模块组织就不算合格.
-- api设计是否简洁有扩展性? 函数不应该设计的过于具体, 否则api中会有多个非常类似的api, 这不够简洁. 函数不应该设计的过于抽象, 过于抽象就能够承载多于一个职责, 使用起来也困难. ![[Think 2025-06-22 23.20.11.excalidraw]]
-- api中每个函数是否有足够的doc说明其用途? 这里doc不应该说明函数的实现细节, 而应该说明函数的意图和行为.
+- `是否履行单一职责`, 处理同一类或者同一个范畴的问题? 如果不符合单一职责, 模块组织就不算合格.
+- `api设计是否简洁有扩展性`? 函数不应该设计的过于具体, 否则api中会有多个非常类似的api, 这不够简洁. 函数不应该设计的过于抽象, 过于抽象就能够承载多于一个职责, 使用起来也困难.
+- `api中每个函数是否有足够的doc说明其用途`? 这里doc不应该说明函数的实现细节, 而应该说明函数的意图和行为.
 
-其次, 评价模块的独立性. 我们把独立性分为几档.
+```{code} python
+:linenos:
+:filename: api_design.py
 
-- 拥有最佳独立性的模块, 只依赖内部子模块和三方模块, 不依赖其他模块. 这样的模块甚至可以独立发布. 一般业务无关的通用的util会整理成这种模块. 有必要的话model也可以整理成这样的模块进行内部发布.
-- 如果一个模块还依赖自己的兄弟模块, 独立性就弱一些, 但在其父模块中, 他仍然保持了一定的灵活性.
-- 如果一个模块反过来依赖了父模块, 抑或其他同级或更高的模块, 那就在模块依赖树中引入了环. 环涉及到的模块会全部耦合在一起. 一般出现这种情况是对代码库的巨大破坏.
-![[Think 2025-06-08 14.42.03.excalidraw]]
+from typing import Any
+
+# 过于抽象的设计, 不符合单一职责
+def process_data(input1, input2,
+                 dubious_switch, 
+                 flag=True, mode=0,
+                 callback=None,
+                 config=None,
+                 *args, **kwargs): ...
+
+
+# 不够简洁, 过于具体, 扩展性不足
+def send_welcome_email_to_new_user(user_id: str) -> bool: ...
+def send_password_reset_email_to_user(user_id: str) -> bool: ...
+def send_order_confirmation_email_to_customer(user_id: str, order_id: str) -> bool: ...
+def send_shipping_notification_email_to_customer(user_id: str, tracking_id: str) -> bool: ...
+def send_promotion_email_to_subscriber(user_id: str, promo_code: str) -> bool: ...
+
+
+# 单一职责, 简洁可扩展, 有足够多的doc说明用途
+def send_email(template_type: "EmailTemplate",
+               recipient_id: str,
+               context: dict[str, Any]) -> "Email": 
+    """
+    @param template_type: email模板
+    @param recipient_id: 收信人id
+    @param context: 上下文信息
+    """    
+        
+    ...
+```
+
+#### 评价模块的独立性
+
+我们把独立性分为几档.
+
+:::::{tab-set}
+
+::::{tab-item} 最佳独立性
+
+:::{figure} ../material/best-independency.png
+`拥有最佳独立性的模块, 只依赖内部子模块和三方模块, 不依赖其他模块`.\
+这样的模块甚至可以独立发布.\
+一般业务无关的通用的util会整理成这种模块. 有必要的话model也可以整理成这样的模块进行内部发布.
+:::
+
+::::
+
+::::{tab-item} 普通独立性
+
+:::{figure} ../material/normal-independency.png
+如果一个模块还依赖自己的兄弟模块, 独立性就弱一些, `但在其父模块中, 他仍然保持了一定的灵活性`.
+:::
+
+::::
+
+::::{tab-item} 耦合
+
+:::{figure} ../material/coupling.png
+如果一个模块反过来依赖了父模块, 抑或其他同级或更高的模块, 那就在模块依赖树中引入了环. `环涉及到的模块会全部耦合在一起`. 一般出现这种情况是对代码库的巨大破坏.
+:::
+::::
+
+:::::
+
 
 ### 两种常见情况的处理
 
 下面再说两个常见的状况.
-第一个状况. 有时我们会发现在实现自己模块的时候, 其他模块有一些私有的util特别方便, 想要拿来主义, 应该怎么做呢? 有两种办法.
-我们可以把这个私有的util提到更高的module下面. 这样对方module和我的module就能引用这个util了. 不过, 首先util要适合暴露出来, 比较通用, 没有副作用才可以. 因为一旦提出来, 别人也会引用, 绝对不可能再放回去.
-另一种做法是, 直接复制一份util到自己模块下面. 有人会反对, 说这样增加了代码的冗余程度, 这并不假, 但比起代码冗余度而言, 模块性更加重要. 但两份util需要被两个团队维护, 并且这两个团队没有共同演化愿景的时候, 这么做就是合适的. 当然, 这种情况发生不会特别频繁. 如果你发现有大量的内容需要搬到自己的模块下面, 应该想一想自己模块是否有存在的必要.
-![[Think 2025-06-08 15.21.24.excalidraw]]
 
-第二个状况. 有时候我们会发现一些三方模块或库我们需要重度使用, 这些三方模块或库如此之重要, 以至于几乎每一个模块我们都需要依赖它们, 譬如一些特殊的计算模块, 特殊领域的概念和util, 或者数据库等常用的功能.
-在引入它们之前需要做一个抉择, 引入后是直接使用它们, 还是重新封装一套相同api的模块, 并将功能代理给它们?
-![[Think 2025-06-08 15.39.58.excalidraw]]
-如果引入的库, api / 性能是绝对稳定的, 我们的需求也是绝对稳定的, 不需要在三方库的基础上进行扩展, 那么直接使用它们是合理的.
-但, 如果这些库api仍旧在发生变化, 性能并不稳定, 甚至还有一些corner case并不适合我们的需求, 我们也仍然存在扩展这些api的需求, 那么就推荐封装自己的module, 提供一套一模一样的api, 并代理给三方库. 这样任何改动, 甚至是切换底层的三方库, 我们都只需要修改自己的module. 而其他的调用的代码都不需要改动. 这是应用依赖反转原则的一种实际场景
+#### 拿来主义
+
+有时我们会发现在实现自己模块的时候, 其他模块有一些私有的util特别方便, 想要拿来主义, 应该怎么做呢? 有两种办法.
+
+1. `我们可以将这个私有的util提升到更高层级的module下`。这样，对方module和我的module都能引用这个util。不过，首先util必须适合被暴露，具备较强的通用性且无副作用。因为一旦提取出来，其他模块也会引用，绝对不可能再放回去。
+
+2. `直接复制一份util到自己的模块下`。有人会反对，认为这样增加了代码冗余，这确实如此，`但相比代码冗余，模块化更为重要`。当两份util`需要由两个团队维护，且这两个团队缺乏共同演化的愿景时，这种做法是合适的`。当然，这种情况并不常见。如果你发现有大量内容需要搬到自己的模块下，应该反思自己模块的存在必要性。
+
+:::{image} ../material/ref-to-other-mod.png
+:::
+
+#### 封装三方库
+
+有时候，我们会发现一些第三方模块或库需要被大量使用，这些第三方模块或库的重要性极高，以至于几乎每个模块都依赖它们，例如某些特殊计算模块、特定领域的概念和util，或数据库等常用功能。
+
+在引入它们之前，需要做出抉择：是直接使用这些库，还是重新封装一套相同API的模块，并将功能代理给它们？
+
+以下是一个数据库三方库的示例.
+
+:::{figure} ../material/wrap-3rd.png
+- <span style="color:blue">[左]</span> 直接使用三方库, 直接依赖三方库API
+- <span style="color:red">[中]</span> 封装一套相同的API并把功能代理给三方库, 使用和直接依赖三方库API没有区别
+- <span style="color:green">[右]</span> 即使三方库升级后改变了API, 甚至直接替换三方库也不会影响我方代码, 等于我们隔离了三方库和我方代码的依赖关系, 他们都{abbr}`依赖我方API(依赖翻转原则)`
+:::
+
+`如果引入的库API和性能绝对稳定，且我们的需求也非常稳定，不需要在第三方库基础上进行扩展，那么直接使用它们是合理的`.
+
+`但若这些库的API仍在变化，性能不稳定，甚至存在一些不适合我们需求的边缘情况，同时我们还需要扩展这些API，则推荐封装自己的模块，提供一套完全相同的API，并代理给第三方库`。\
+如此一来, 任何改动(甚至切换底层第三方库这种改动)，也只需修改自己的API下的实现，其他调用代码无需变更。这正是应用依赖反转原则的一个实际场景。

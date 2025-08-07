@@ -88,6 +88,7 @@ bfs_recursive(['A'], visited, graph)
 :linenos:
 :filename: strong_typed.cpp
 :caption: c++是强类型的语言, 一些c中允许的操作在c++中是不被允许的
+:emphasize-lines: 9,14
 
 int main() {
     int a = 5;
@@ -114,6 +115,7 @@ int main() {
 :linenos:
 :filename: weak_typed.c
 :caption: 只需要使用void\*指向任何值, 就可以抹去原有类型, 然后赋值给任意其他类型的指针
+:emphasize-lines: 25-27
 
 #include <stdio.h>
 
@@ -461,6 +463,7 @@ def binary_search(arr, target):
 ```{code} python
 :linenos:
 :filename: stateless_api.py
+:emphasize-lines: 2,13
 
 # 无状态API
 def traffic_light(state, action):
@@ -489,6 +492,7 @@ print(current_state)  # output: yellow
 ```{code} python
 :linenos:
 :filename: stateful_api.py
+:emphasize-lines: 3,7,9,11
 
 class TrafficLight:
     def __init__(self):

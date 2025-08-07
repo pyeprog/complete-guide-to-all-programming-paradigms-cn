@@ -1,71 +1,168 @@
-# Meta Programming
+# 元编程
 
-![[Think 2025-06-24 12.01.32.excalidraw]]
-最后要介绍的是meta programming. 这个模型的核心理念是代码即数据. 而这个理念冯诺伊曼早在1946年就已经提出. 并且冯诺伊曼机也是按照这个理念设计的. 因此针对meta programming的应用实际上很早就有了.
+最后要介绍的是{abbr}`元编程(meta programming)`. 这个模型的核心理念是`代码即数据`. 
+
+“代码即数据”的理念由冯·诺依曼早在1946年提出，冯·诺依曼机的设计也基于这一理念。因此，针对[元编程](https://en.wikipedia.org/wiki/Metaprogramming)的实践实际上由来已久。
+
+:::{image} ../material/meta-programming-meme.png
+:::
+
 
 ## Meta Programming的不同含义
 
-根据《Meta-Programming and Model-Driven Meta-Programming Development》这本书, “meta-programming”其实代表很多不同的应用方向.
-![[Pasted Image 20250522221530_002.png]]
-第一个应用方向是transformation, 程序接受一种语言的源码, 并把它改写成另一种语言. 例如typescript改写成javascript, python2改写为python3, C with class(c++前身)改写为C.
+根据[^meta-programming-book], "元编程"其实代表很多不同的应用方向.
 
-其次是generation, 程序接受一种说明文件(spec), 然后把它改写成程序. 譬如JIT根据字节码创造机器码, Yacc根据语法描述, 生成parser, compiler根据源码生成机器码等等. 这种应用把代码分成了不同的抽象层级.
+:::{image} ../material/meta-programming-table.png
+:width: 100%
+:align: center
+:::
 
-以上是异质meta programming(heterogeneous meta-programming), 即meta程序和应用程序不是用同一种语言编写的.
-后面要介绍的meta programming是同质meta programming(homogeneous meta-programming), 即meta程序和应用程序是同一种语言编写的.
+### 异质元编程
 
-同质化meta programming的一个常见的应用方向是generalization, 即让代码变得更通用, 譬如各种语言中的template系统, 可以用来编写generic数据容器.
+{abbr}`异质元编程(heterogeneous meta-programming)`, 是指meta程序和应用程序不是用同一种语言编写的.
 
-```c++
+异质元编程应用方向包括:
+
+- **Transformation**, 即程序接受一种语言的源码, 并把它改写成另一种语言的源码. 例如typescript改写成javascript, python2改写为python3, {abbr}`C with class(c++前身)`改写为C.
+- **Generation**, 程序接受一种{abbr}`说明文件(spec文件)`, 然后把它改写成程序. 譬如JIT根据字节码创造机器码, Yacc根据语法描述生成parser, compiler根据源码生成机器码等等. 这种应用把代码分成了不同的抽象层级.
+
+然而除非专门研究语言设计, 异质元编程在日常应用开发中, 我们很少接触. 
+
+### 同质元编程
+
+{abbr}`同质元编程(homogeneous meta-programming)`, 是指meta程序和应用程序是同一种语言编写的.
+
+#### Generalization
+
+同质化元编程的一个常见的应用方向是{abbr}`generalization(代码泛化)`, 即让代码变得更通用, 譬如各种语言中的template系统, 可以用来编写generic数据容器和复杂的算法.
+
+```{code} cpp
+:linenos:
+:filename: generalization.cpp
+
+#include <cstddef>
+
 template<typename T, size_t N>
 class Stack {
 private:
-    T data[N];
-    size_t top = 0;
+	T data[N];
+	size_t top = 0;
 
 public:
-    void push(const T& item) {
-        if (top < N) data[top++] = item;
-    }
+	void push(const T& item) {
+		if (top < N) data[top++] = item;
+	}
 
-    T pop() {
-        return top > 0 ? data[--top] : T{};
-    }
+	T pop() {
+		return top > 0 ? data[--top] : T{};
+	}
 
-    bool empty() const { return top == 0; }
-    size_t size() const { return top; }
+	bool empty() const { return top == 0; }
+	size_t size() const { return top; }
 };
 
-  
-
 int main() {
-    Stack<int, 10> intStack;
- Stack<float, 20> floatStack;
+	Stack<int, 10> intStack;
+	Stack<float, 20> floatStack;
+};
     
 ```
 
-另一个应用方向是编写meta-program. 譬如lisp中提供的macro, c++中template meta programming, 都是在原有应用程序的基础上, 提供了扩展语言, 编译时运行, 动态生成代码等能力.
+#### 开发meta-program
 
-```lisp
-;; Define a macro that creates getter/setter functions
+同质化元编程另一个应用方向是编写meta-program. 譬如lisp, c, rust等语言中的macro, 都是在原有应用程序的基础上, `提供了扩展语言, 编译时运行, 动态生成代码`等能力.
+
+::::{tab-set}
+
+:::{tab-item} lisp macro
+```{code} lisp
+:linenos:
+:filename: macro.lisp
+:caption: 参考[^lisp-book]中的第10章
+
+;; 定义一个宏, 运行后自动生成一个全局变量和它的getter, setter
 (defmacro defproperty (name)
-  (let ((getter (intern (format nil "GET-~A" name)))
-        (setter (intern (format nil "SET-~A" name)))
-        (var (intern (format nil "*~A*" name))))
+  (let ((getter (intern (format nil "GET-~A" name)))
+		(setter (intern (format nil "SET-~A" name)))
+		(var (intern (format nil "*~A*" name))))
 
-    `(progn
-       (defvar ,var nil)
-       (defun ,getter () ,var)
-       (defun ,setter (value) (setf ,var value)))))
+	`(progn
+	   (defvar ,var nil)
+	   (defun ,getter () ,var)
+	   (defun ,setter (value) (setf ,var value)))))
 
 (defproperty username)
 (set-username "Alice")
-(print (get-username))
+(print (get-username)))
 ```
+:::
+
+:::{tab-item} c macro
+```{code} c
+:linenos:
+:filename: macro.c
+
+#include <stdio.h>
+
+// 定义生成add函数的宏
+#define GENERATE_ADD_FUNC(type)       \
+type add_##type(type a, type b) {     \
+  return a + b;                       \
+}
+
+GENERATE_ADD_FUNC(int)
+GENERATE_ADD_FUNC(float)
+
+int main() {
+  int iresult = add_int(3, 4);
+  float fresult = add_float(2.5f, 4.5f);
+
+  printf("int add: %d\n", iresult);
+  printf("float add: %.2f\n", fresult);
+
+  return 0;
+}
+```
+:::
+
+:::{tab-item} rust macro
+```{code} rust
+:linenos:
+:filename: macro.rs
+
+// 定义生成add函数的宏
+macro_rules! generate_add_fn {
+    ($func_name:ident, $t:ty) => {
+        fn $func_name(a: $t, b: $t) -> $t {
+            a + b
+        }
+    };
+}
+
+generate_add_fn!(add_i32, i32);
+generate_add_fn!(add_f64, f64);
+
+fn main() {
+    let int_sum = add_i32(3, 4);
+    let float_sum = add_f64(2.5, 4.5);
+
+    println!("int add: {}", int_sum);
+    println!("float add: {}", float_sum);
+}
+
+```
+:::
+::::
+
+#### 关注点分离
 
 一些框架使用了meta-programming的技巧, 分离关注点, 把业务和框架代码完全隔离. 譬如spring MVC/boot中的应用.
 
-```java
+```{code} java
+:linenos:
+:filename: xController.java
+:caption: 在使用spring boot之后, 在代码库中除了注解, 你几乎看不到任何关于spring的代码. 而注解本身没有任何逻辑效用.
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -86,8 +183,6 @@ public class UserController {
     }
 }
 
-  
-
 @Service
 @Transactional
 public class UserService {
@@ -105,69 +200,117 @@ public class UserService {
 }
 ```
 
-另外常见的两种能力是reflection(反射)和meta-data. reflection是在运行时能够获取当前代码结构(譬如类上的结构信息, 函数结构信息, 上下文信息), 甚至修改这些结构和行为, 譬如修改和扩充类定义. 而meta-data则是可以直接把各种文档和描述直接附在程序中, 甚至在runtime下都能直接访问.
+#### 反射和元信息
 
-```python
-import inspect
-from functools import wraps
+另外常见的两种能力是{abbr}`反射(reflection)`和{abbr}`元信息(meta-data)`. 反射是在运行时能够获取当前代码结构(譬如类上的结构信息, 函数结构信息, 上下文信息), 甚至修改这些结构和行为(譬如修改和扩充类定义). 而元信息是可以直接把各种文档和描述直接附在程序中, 甚至在runtime下都能直接访问.
 
-def api_endpoint(method="GET", path="/", description=""):
-    """Metadata decorator"""
-    def decorator(func):
-        func._api_method = method
-        func._api_path = path  
-        func._api_description = description
-        return func
+```{code} python
+:linenos:
+:filename: dynamicly_load_json.py
+:emphasize-lines: 19,26
 
-    return decorator
+import json
+from dataclasses import dataclass, fields, is_dataclass
+from typing import List, get_origin, get_args
 
-  
-class APIController:
-    @api_endpoint("GET", "/users", "Get all users")
-    def get_users(self):
-        return ["user1", "user2"]
+@dataclass
+class Address:
+    street: str
+    city: str
 
-    @api_endpoint("POST", "/users", "Create user")
-    def create_user(self, data):
-        return f"Created: {data}"
+@dataclass
+class Person:
+    name: str
+    age: int
+    address: Address
+    tags: List[str]
 
+# 通用的from_json方法, 使用反射的技巧来动态加载json到dataclass中.
+def from_json(cls, json_dict):
+    """这里的docstring就是元信息, 你可以通过from_json.__doc__在runtime下得到这些元信息"""
 
-# Reflection: inspect and modify at runtime
-controller = APIController()
+    if not is_dataclass(cls):
+        raise TypeError(f"{cls} is not a dataclass")
 
-# Access metadata
-for name, method in inspect.getmembers(controller, inspect.ismethod):
-    if hasattr(method, '_api_path'):
-        print(f"{method._api_method} {method._api_path} - {method._api_description}")
+    init_kwargs = {}
+    
+    for field in fields(cls):  # 遍历给定class的每一个字段
+        field_value = json_dict.get(field.name)
 
-# Runtime modification
-def new_method(self):
-    return "Dynamic method added!"
+        if field_value is None:
+            continue
 
-# Add method dynamically using reflection
-setattr(APIController, 'dynamic_endpoint', new_method)
-print(f"Added method: {hasattr(controller, 'dynamic_endpoint')}")
+        field_type = field.type
+        origin = get_origin(field_type)
+
+        # 如果字段是嵌套的dataclass, 递归调用from_json进行处理
+        if is_dataclass(field_type):
+            init_kwargs[field.name] = from_json(field_type, field_value)
+
+        # 如果字段是个list, 尤其是list of dataclasses, 要进行递归处理
+        elif origin is list or origin is List:
+            item_type = get_args(field_type)[0]
+            if is_dataclass(item_type):
+                init_kwargs[field.name] = [from_json(item_type, item) for item in field_value]
+            else:
+                init_kwargs[field.name] = field_value
+
+        else:
+            init_kwargs[field.name] = field_value
+
+    return cls(**init_kwargs)
+
+# Example JSON
+json_str = '''
+{
+    "name": "Bob",
+    "age": 40,
+    "address": {
+        "street": "123 Main St",
+        "city": "Metropolis"
+    },
+    "tags": ["friend", "colleague"]
+}
+'''
+
+data = json.loads(json_str)
+person = from_json(Person, data)
+
+# 使用反射遍历person的字段.
+for field in fields(person):
+    value = getattr(person, field.name)
+    print(f"Field: {field.name}, Type: {field.type}, Value: {value}")
+
 ```
 
-每一种语言都会提供一种或几种相关的能力.
-编译型语言一般支持模版, macro, 提供meta program和generalization. 解释型语言一般支持meta program, 反射和meta-data.
+---
+
+每种语言通常都会提供一种或多种相关能力。
+
+-  **编译型语言**一般支持模板(template)、宏(macro)，以实现元编程(meta programming)和泛化(generalization)。
+-  **解释型语言**通常支持元编程、反射（reflection）以及元数据（meta-data）。
 
 ## 什么时候使用meta Programming
 
-什么时候使用meta-programming呢? 需要分情况讨论.
+什么时候使用meta-programming呢？需要分情况讨论。
 
-- 异质meta programming在日常工作中用的比较少. 难度偏大. 使用的不是特别频繁.
-- 同质meta programming在日常工作中有使用.
+-  **异质meta programming**在日常工作中使用较少，难度较大，频率不高。
+-  **同质meta programming**在日常工作中较为常见。
 
-其中最常用的是, generalization, reflection, meta-data.
+其中最常用的包括generalization、reflection和meta-data。
 
-- generalization在实现一些比较通用的算法函数, 容器类的时候会经常使用. 如果是语言是动态类型的, 也就是一个变量可以绑定不同类型的数据, 则一般不会提供这种特性.
-- reflection经常被用来做判断. 判断是否对象是某个类的; 获取类的方法列表和数据列表; 获取函数的签名(参数列表和返回值). 而动态构造类, 比较难以驾驭, 因此比较少使用.
-- meta-data最常见的用例就是函数, 类, 模块的doc-string. 这几乎成了标配.
+-  **Generalization**常用于实现通用算法函数和容器类。如果语言是动态类型（变量可绑定不同类型数据），则通常不会(也不需要)提供这类特性。
+-  **Reflection**常用于判断对象类型、获取类的方法和数据列表、获取函数签名（参数列表和返回值）。动态构造类较难掌控，因此较少使用。
+-  **Meta-data**最常见的用例是函数、类、模块的doc-string，几乎成为标配。
 
-编写meta-program相对而言比较不常用, 其中需要再细分.
+编写meta-program相对不常用，且需细分：
 
-- template meta programming尽量少用. 很多template meta programming技巧都被用在约束template的类型参数上, 有可能的话使用c++20中的concept是更好的选择.
-- macro被用来定义一些宏(代码片段模板), 后续可以利用这些宏来生成代码片段. 这种技巧为例巨大, 容易被反噬. 毕竟一个重要的经验法则是, 如果你不知道是否应该使用meta programming, 那就别用. 如果你真的需要定义宏, 那你一定非常了解所有其他方法都显然不能满足需求, 只有使用macro.
+-  **Template meta programming**应尽量少用。许多技巧用于约束template的类型参数，若可能，C++20中的concept是更优选择。
+-  **Macro**用于定义代码片段模板，后续可利用宏生成代码。此技巧影响巨大，也易反噬。经验法则是：如果不确定是否应使用meta programming，就不要使用；若确实需要定义宏，说明你非常了解其他方法无法满足需求，只有宏能解决。
 
-最后, 如果代码库中引入了meta-programming技巧, 则需要大量测试进行覆盖. 升级编译器/解释器版本的时候甚至需要全量测试, 保证业务系统行为不变.
+最后，若代码库引入meta-programming技巧，`需大量测试覆盖。升级编译器或解释器版本时，甚至需要全量测试以确保业务系统行为不变`。
+
+---
+
+[^meta-programming-book]: [Meta-Programming and Model-Driven Meta-Programming Development](https://www.amazon.com/Meta-Programming-Model-Driven-Meta-Program-Development-Information/dp/1447141253), 作者 Vytautas Štuikys, Robertas Damaševičius, 2013年出版  
+[^lisp-book]: [ANSI Common Lisp](https://book.douban.com/subject/1456906/), 作者 Paul Graham, 1995年出版
