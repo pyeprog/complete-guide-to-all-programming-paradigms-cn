@@ -6,7 +6,8 @@ project:
   open_access: true
   title: "编程语言全景探索"
   subtitle: 如何一次性学会所有编程语言
-  # description:
+  description: "本书尝试带你概览绝大部分主流编程语言的重要特性以及这些特性对应语言背后的模型. 了解这些模型和对应的特性能够快速了解这门语言能做什么, 以及怎么做."
+  # thumbnail: book-logo.png
   keywords: ["模型", "声明式", "函数式", "OOP", "面向并发", "显示状态", "逻辑编程", "元编程", "限制编程"]
   authors: 
     - name: 长路
@@ -62,6 +63,6 @@ site:
   options:
     logo: book-logo.png
     favicon: book-logo.ico
-  nav:
-    - title: 视频
-      url: https://www.bilibili.com/video/BV1Fpgbz4EvN/?share_source=copy_web&vd_source=23cc890afc1c4768bfa49bbf1c50ad48
+  # nav:
+  #   - title: 对应视频
+  #     url: https://www.bilibili.com/video/BV1Fpgbz4EvN/?share_source=copy_web&vd_source=23cc890afc1c4768bfa49bbf1c50ad48

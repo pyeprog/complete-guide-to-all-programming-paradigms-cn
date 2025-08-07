@@ -185,7 +185,7 @@ leaf_engine/
 
 :::{figure} ../material/implicit-def.png
 以rust为例子, 例如`user.rs`对应`user`这个module，`drawer/mod.rs`是一个特殊文件，对应`drawer`这个module。
-我们还可以在main中定义<span style="color:green">sub</span>这个子模块.
+我们还可以在main中定义{span .text-green-500}`sub`这个子模块.
 :::
 
 在这种风格下，许多语言还支持在单个文件中定义子模块。譬如以下例子.
@@ -227,9 +227,9 @@ mod math_utils {
 你可以在M个源文件中定义N个module. 这里module是逻辑上的module, 跟文件和文件结构都没有关系, 两者并不需要一一对应, 因为就算不对应也能够正确编译执行.
 
 :::{figure} ../material/explicit-def.png
-- <span style="color:blue">[左] java项目的文件目录</span>
-- <span style="color:green">[右] elixir项目的文件目录</span>
-- 假设两者有相同的模块定义, 即使两者的文件组织结构相差很多, 经过编译, <span style="color:red">两者都能形成相同的模块结构[中]</span>
+- {span .text-blue-500}`[左] java项目的文件目录`
+- {span .text-green-500}`[右] elixir项目的文件目录`
+- 假设两者有相同的模块定义, 即使两者的文件组织结构相差很多, 经过编译, {span .text-red-500}`两者都能形成相同的模块结构[中]`
 :::
 
 :::{admonition} 虽然源文件和模块结构彼此独立
@@ -336,8 +336,8 @@ func main() {
 
 ::::{caution} 隐式风格中根目录和模块引用路径需要对应
 :::{figure} ../material/root-error-implicit-def.png
-- <span style="color:green">在/parent/project中运行main.py是正确的</span>
-- <span style="color:red">在/parent/project/deeply/nested中运行test.py则是错误的, 因为test.py中import的写法是以/parent/project为根目录, 而不是/parent/project/deeply/nested.</span>
+- {span .text-green-500}`在/parent/project中运行main.py是正确的`
+- {span .text-red-500}`在/parent/project/deeply/nested中运行test.py则是错误的, 因为test.py中import的写法是以/parent/project为根目录, 而不是/parent/project/deeply/nested.`
 :::
 ::::
 
@@ -356,9 +356,9 @@ func main() {
 :::{figure} ../material/module-class-instance.png
 :width: 100%
 :align: center
-- \[左] <span style="color:red">作为module的stack</span>仅暴露一组无状态函数, 它不会创建实例
-- \[中] <span style="color:green">作为class的stack</span>也仅暴露一组无状态函数, 跟module类似
-- \[右] <span style="color:blue">作为object的stack</span>"{underline}`也可以`"暴露一组方法, 同时在外部管理数据, {underline}`虽然我们一般不会这么用`, object能够提供更加强大的功能
+- \[左] {span .text-red-500}`作为module的stack`仅暴露一组无状态函数, 它不会创建实例
+- \[中] {span .text-green-500}`作为class的stack`也仅暴露一组无状态函数, 跟module类似
+- \[右] {span .text-blue-500}`作为object的stack`"{underline}`也可以`"暴露一组方法, 同时在外部管理数据, {underline}`虽然我们一般不会这么用`, object能够提供更加强大的功能
 :::
 
 ## 如何用好module
@@ -555,9 +555,9 @@ def send_email(template_type: "EmailTemplate",
 以下是一个数据库三方库的示例.
 
 :::{figure} ../material/wrap-3rd.png
-- <span style="color:blue">[左]</span> 直接使用三方库, 直接依赖三方库API
-- <span style="color:red">[中]</span> 封装一套相同的API并把功能代理给三方库, 使用和直接依赖三方库API没有区别
-- <span style="color:green">[右]</span> 即使三方库升级后改变了API, 甚至直接替换三方库也不会影响我方代码, 等于我们隔离了三方库和我方代码的依赖关系, 他们都{abbr}`依赖我方API(依赖翻转原则)`
+- {span .text-blue-500}`span style="color:blue"[左]` 直接使用三方库, 直接依赖三方库API
+- {span .text-red-500}`[中]` 封装一套相同的API并把功能代理给三方库, 使用和直接依赖三方库API没有区别
+- {span .text-green-500}`[右]` 即使三方库升级后改变了API, 甚至直接替换三方库也不会影响我方代码, 等于我们隔离了三方库和我方代码的依赖关系, 他们都{abbr}`依赖我方API(依赖翻转原则)`
 :::
 
 `如果引入的库API和性能绝对稳定，且我们的需求也非常稳定，不需要在第三方库基础上进行扩展，那么直接使用它们是合理的`.
