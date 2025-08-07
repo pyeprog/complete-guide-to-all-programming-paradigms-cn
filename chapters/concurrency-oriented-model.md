@@ -16,11 +16,11 @@
 
 面向并发编程不同于顺序执行的编程范式.
 
-如果你有过后端开发经验，可以回想一下，一个service能够做什么。无论采用何种协议，service总会提供一组API，其他进程可以向其发送请求并获得相应的响应。service可以用来执行某种计算任务，`类似于运行在其他进程中的函数`；一旦service具备存储能力，我们还可以对其进行读写操作，`类似于声明在其他进程中的数据容器`。
+如果你有过后端开发经验, 可以回想一下, 一个service能够做什么. 无论采用何种协议, service总会提供一组API, 其他进程可以向其发送请求并获得相应的响应. service可以用来执行某种计算任务, `类似于运行在其他进程中的函数`；一旦service具备存储能力, 我们还可以对其进行读写操作, `类似于声明在其他进程中的数据容器`. 
 
-`面向并发编程即在一个系统进程中启动若干线程，这些线程既可以作为计算单元，也可以作为数据容器。线程之间能够相互通信。其他线程可以发送消息，调用这些服务线程所提供的功能，也可以接收服务线程发送的消息以获取返回值`。
+`面向并发编程即在一个系统进程中启动若干线程, 这些线程既可以作为计算单元, 也可以作为数据容器. 线程之间能够相互通信. 其他线程可以发送消息, 调用这些服务线程所提供的功能, 也可以接收服务线程发送的消息以获取返回值`. 
 
-Elixir代码示例如下。
+Elixir代码示例如下. 
 
 ```{code} elixir
 :linenos:
@@ -103,14 +103,14 @@ Calculator.value(pid)     # 对服务发送value消息, 并打印返回值
 
 以上就是在面向并发编程的范式下, 选择service而不是本地函数调用的场景.
 
-上述面向并发编程可能会让你联想到微服务，二者在某些方面确实有相似之处。面向并发编程属于语言范畴的概念，而微服务则属于应用架构范畴。尽管两者处于不同领域，但存在许多高度相似的实践。理解面向并发编程，有助于更好地理解微服务的实践，甚至能在其中发现云原生应用中的对应概念。
+上述面向并发编程可能会让你联想到微服务, 二者在某些方面确实有相似之处. 面向并发编程属于语言范畴的概念, 而微服务则属于应用架构范畴. 尽管两者处于不同领域, 但存在许多高度相似的实践. 理解面向并发编程, 有助于更好地理解微服务的实践, 甚至能在其中发现云原生应用中的对应概念. 
 
 ## Actor Model
 
-虽然我们可以开启大量线程协同工作，但在至少在CSP模型中，代码仍显得冗长繁复。\
-原因在于，`CSP模型抽象了线程间数据交换，使这部分代码简化，但线程的启动、管理以及指定数据流向仍需手动操作`，大部分冗长代码正是用于完成这些工作。
+虽然我们可以开启大量线程协同工作, 但在至少在CSP模型中, 代码仍显得冗长繁复. \
+原因在于, `CSP模型抽象了线程间数据交换, 使这部分代码简化, 但线程的启动, 管理以及指定数据流向仍需手动操作`, 大部分冗长代码正是用于完成这些工作. 
 
-最早由Carl Hewitt提出的Actor模型，旨在进一步抽象线程管理和数据流向，使得语言更适合面向并发编程。Actor模型并非与某种语言强绑定，许多语言均有各自的Actor模型实现。
+最早由Carl Hewitt提出的Actor模型, 旨在进一步抽象线程管理和数据流向, 使得语言更适合面向并发编程. Actor模型并非与某种语言强绑定, 许多语言均有各自的Actor模型实现. 
 :::::{grid} 2
 ::::{card}
 :header: Carl Hewitt
@@ -148,7 +148,7 @@ Erlang的三位作者之一, Erlang将actor model发扬光大
 :linenos:
 :filename: msg_handle.ex
 :emphasize-lines: 3-8
-:caption: 孵化Talker线程后，我们会获得该线程的pid，通过向pid发送消息来触发Talker中对应的处理函数。Talker调用loop方法并递归执行，相当于循环运行该方法。receive在消息队列为空时会挂起线程，待有消息时恢复运行，类似于CSP模型中的select。该例子来自[^elixir-in-action]
+:caption: 孵化Talker线程后, 我们会获得该线程的pid, 通过向pid发送消息来触发Talker中对应的处理函数. Talker调用loop方法并递归执行, 相当于循环运行该方法. receive在消息队列为空时会挂起线程, 待有消息时恢复运行, 类似于CSP模型中的select. 该例子来自[^elixir-in-action]
 
 defmodule Talker do
   def loop do
@@ -229,14 +229,14 @@ defmodule Worker do
     # 启动GenServer进程并链接当前进程
     # __MODULE__表示当前模块Worker
     # :ok是传递给init回调的初始状态参数
-    # []表示启动选项，这里为空
-    # 返回值 {:ok, pid} 表示启动成功，pid是进程ID
+    # []表示启动选项, 这里为空
+    # 返回值 {:ok, pid} 表示启动成功, pid是进程ID
     GenServer.start_link(__MODULE__, :ok, [])
   end
 
   # 服务器回调
   def init(:ok) do
-    # 设置当前进程为trap_exit模式，允许接收退出信号消息
+    # 设置当前进程为trap_exit模式, 允许接收退出信号消息
     Process.flag(:trap_exit, true)
     {:ok, %{}}
   end
@@ -255,21 +255,21 @@ defmodule SupervisorExample do
     # 启动Supervisor进程并链接当前进程
     # __MODULE__表示当前模块SupervisorExample
     # :ok是传递给init回调的参数
-    # name: __MODULE__ 给Supervisor注册一个全局名称，方便查找
+    # name: __MODULE__ 给Supervisor注册一个全局名称, 方便查找
     Supervisor.start_link(__MODULE__, :ok, name: __MODULE__)
   end
 
   def init(:ok) do
     children = [
-      {Worker, []}  # 启动Worker模块作为子进程，传递空参数
+      {Worker, []}  # 启动Worker模块作为子进程, 传递空参数
     ]
 
-    # 采用one_for_one策略：如果子进程退出，只重启该子进程
+    # 采用one_for_one策略: 如果子进程退出, 只重启该子进程
     Supervisor.init(children, strategy: :one_for_one)
   end
 end
 
-# 运行示例：
+# 运行示例: 
 # 当前线程孵化Supervisor线程, Supervisor线程孵化Worker线程
 # 这里使用了GenServer宏去规范Worker的API, 使用Supervisor宏去快速实现一个supervisor
 {:ok, sup} = SupervisorExample.start
@@ -279,15 +279,15 @@ end
 
 ::::
 
-Actor模型提出了一种非常强大的范式，能够极大地影响代码的组织结构。相比底层的CSP模型和共享内存模型，Actor模型更为高级，但代价是通用性较低。因此，与其他更通用的范式相比，它主要用于并发问题的建模。
+Actor模型提出了一种非常强大的范式, 能够极大地影响代码的组织结构. 相比底层的CSP模型和共享内存模型, Actor模型更为高级, 但代价是通用性较低. 因此, 与其他更通用的范式相比, 它主要用于并发问题的建模. 
 
 ### Actor Model中的特定写法
 
 #### 如何拿到返回值
 
-`Actor模型整体倡导“fire and forget”的风格`。我们启动一个线程去完成特定任务，但线程一旦创建便不再管理，也不期待返回值；或者对于一个已存在的服务线程发送消息，消息一旦发送便不再管理，也无法获得对方处理消息后的响应。那么，`当我们需要任务的返回值时该如何处理`？能否像调用函数那样，调用完毕即可获得返回值？
+`Actor模型整体倡导“fire and forget”的风格`. 我们启动一个线程去完成特定任务, 但线程一旦创建便不再管理, 也不期待返回值；或者对于一个已存在的服务线程发送消息, 消息一旦发送便不再管理, 也无法获得对方处理消息后的响应. 那么, `当我们需要任务的返回值时该如何处理`? 能否像调用函数那样, 调用完毕即可获得返回值? 
 
-此时需要实现一种同步机制，采用spawn+receive或send+receive的方式。先启动任务或发送消息，`在任务参数或消息体中携带自身线程的pid，然后立即调用receive，等待接收对方发送的响应消息`。这种写法是Actor模型的典型特征，具体示例如下：
+此时需要实现一种同步机制, 采用spawn+receive或send+receive的方式. 先启动任务或发送消息, `在任务参数或消息体中携带自身线程的pid, 然后立即调用receive, 等待接收对方发送的响应消息`. 这种写法是Actor模型的典型特征, 具体示例如下: 
 
 ```{code} elixir
 :linenos:
@@ -328,7 +328,7 @@ end
 :::{figure} ../material/actor-model-order-problem.png
 :align: center
 :width: 100%
-这种写法带来一个问题：如果一次性发送多个请求，响应消息未必按顺序到达，从而引发一定限制。
+这种写法带来一个问题: 如果一次性发送多个请求, 响应消息未必按顺序到达, 从而引发一定限制. 
 :::
 
 #### 如何"跳出"复杂的递归函数
@@ -364,15 +364,15 @@ RecursionThrow.run()
 
 ### 什么时候使用actor Model
 
-`使用actor model的前提是需求本质上涉及并发问题，即多个主体需同时运行并实时交互`。  
+`使用actor model的前提是需求本质上涉及并发问题, 即多个主体需同时运行并实时交互`.   
 
-如果需求是同质线程对有限资源的竞争利用，actor model则不太适合，它不适用于大规模的数据批处理（batch data processing）。\
-`Actor model更强调不同主体的独立运行，通过异步消息进行沟通，从而编织计算逻辑。它侧重于大规模异步业务逻辑的执行，而非大规模同步数据处理`。
+如果需求是同质线程对有限资源的竞争利用, actor model则不太适合, 它不适用于大规模的数据批处理(batch data processing). \
+`Actor model更强调不同主体的独立运行, 通过异步消息进行沟通, 从而编织计算逻辑. 它侧重于大规模异步业务逻辑的执行, 而非大规模同步数据处理`. 
 
-因此，actor model适用的主要场景包括：
+因此, actor model适用的主要场景包括: 
 
-- 服务器端系统，最经典的例子是 Web 服务器  
-- 分布式系统，尤其是任务具有强时效性的分布式系统，例如电梯调度模拟、电子电路系统模拟等。
+- 服务器端系统, 最经典的例子是 Web 服务器  
+- 分布式系统, 尤其是任务具有强时效性的分布式系统, 例如电梯调度模拟, 电子电路系统模拟等. 
 
 ### 怎么使用Actor Model?
 
@@ -407,27 +407,27 @@ end
 
 #### Supervisor Tree
 
-回顾上面CSP model中，会有一些线程是supervisor。在actor model中，也有类似的管理线程，当worker线程出错退出时，supervisor线程会收到消息，并负责重启worker线程。Actor model提供了link机制，使两个线程连接在一起，一个崩溃退出，另一个也会收到相应的exit信号。
+回顾上面CSP model中, 会有一些线程是supervisor. 在actor model中, 也有类似的管理线程, 当worker线程出错退出时, supervisor线程会收到消息, 并负责重启worker线程. Actor model提供了link机制, 使两个线程连接在一起, 一个崩溃退出, 另一个也会收到相应的exit信号. 
 
-我们可以利用该机制，将所有worker线程与supervisor线程连接起来。一个Supervisor管理一组Worker. 而当Supervisor本身出错停止时, 它也需要被重启，所以Supervisor应该由更高层的Supervisor负责管理。
+我们可以利用该机制, 将所有worker线程与supervisor线程连接起来. 一个Supervisor管理一组Worker. 而当Supervisor本身出错停止时, 它也需要被重启, 所以Supervisor应该由更高层的Supervisor负责管理. 
 
 :::{figure} ../material/supervisor-tree.png
 :width: 100%
 :align: center
-一组线程被一个supervisor线程管理, 如此层层递进，形成了supervisor tree。
+一组线程被一个supervisor线程管理, 如此层层递进, 形成了supervisor tree. 
 :::
 
-由于该模式极为常用，Erlang和Elixir的OTP库中提供了GenServer和Supervisor宏，方便快速实现supervisor tree. 参考@supervisor-impl
+由于该模式极为常用, Erlang和Elixir的OTP库中提供了GenServer和Supervisor宏, 方便快速实现supervisor tree. 参考@supervisor-impl
 
 #### Name Service
 
-另一种应用模式是名称服务（name service）。  
-在actor model中，使用pid作为线程的地址进行消息收发，但pid本身不易记忆，且线程关闭重启后，`pid会发生变化。为pid起一个稳定的别名，可以简化线程间的交互`。
+另一种应用模式是名称服务(name service).   
+在actor model中, 使用pid作为线程的地址进行消息收发, 但pid本身不易记忆, 且线程关闭重启后, `pid会发生变化. 为pid起一个稳定的别名, 可以简化线程间的交互`. 
 
-如果存在一种机制，能够将别名映射到pid，那么我们只需记住别名，使用时查询对应pid即可。  
+如果存在一种机制, 能够将别名映射到pid, 那么我们只需记住别名, 使用时查询对应pid即可.   
 
-在actor model中，通常`将提供名称到pid映射的功能实现为一个服务`，供其他线程使用，我们称之为Name service。  
-这一概念在网络服务中对应DNS服务器，在分布式系统中对应Zookeeper或Kubernetes中的Service，是分布式系统中的常见服务。  
+在actor model中, 通常`将提供名称到pid映射的功能实现为一个服务`, 供其他线程使用, 我们称之为Name service.   
+这一概念在网络服务中对应DNS服务器, 在分布式系统中对应Zookeeper或Kubernetes中的Service, 是分布式系统中的常见服务.   
 
 ```{code} elixir
 :linenos:
@@ -480,11 +480,11 @@ end
 
 #### Key-value Storage
 
-还有一种分布式系统中常用的服务是键值存储服务，类似于 Redis、etcd 等。它方便不同线程之间共享数据，或用于记录集群自身的状态与配置。  
+还有一种分布式系统中常用的服务是键值存储服务, 类似于 Redis, etcd 等. 它方便不同线程之间共享数据, 或用于记录集群自身的状态与配置.   
 
-此处不再提供代码示例，有兴趣可参考[^elixir-in-action]一书。  
+此处不再提供代码示例, 有兴趣可参考[^elixir-in-action]一书.   
 
-以上就是面向并发编程和actor model的全部内容。
+以上就是面向并发编程和actor model的全部内容. 
 
 ---
 

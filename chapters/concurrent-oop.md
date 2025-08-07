@@ -4,9 +4,9 @@ OOP中的并发操作也大量的使用到了`lock`和`condition variable`, 使�
 
 ## OOP并发模型的新特性
 
-并发OOP中也存在特殊概念，适用于对象系统的并发操作, 这个概念叫做**monitor**。
+并发OOP中也存在特殊概念, 适用于对象系统的并发操作, 这个概念叫做**monitor**. 
 
-Monitor是一种类，其对象内部内置一个lock和至少一个condition variable。它不仅提供互斥访问的机制，还支持让访问该对象的线程休眠或被唤醒的功能，从而有效管理并发环境下的同步与通信。换句话说, monitor把lock和condition variable整合到了同一个对象中, 并使其更方便使用. 
+Monitor是一种类, 其对象内部内置一个lock和至少一个condition variable. 它不仅提供互斥访问的机制, 还支持让访问该对象的线程休眠或被唤醒的功能, 从而有效管理并发环境下的同步与通信. 换句话说, monitor把lock和condition variable整合到了同一个对象中, 并使其更方便使用. 
 
 ::::{tab-set}
 

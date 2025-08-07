@@ -571,7 +571,7 @@ Declarative model的表现力很弱, 应对复杂多变的业务时, 这个模�
 ---
 
 [^the-model-book]: [Concepts, Techniques, and Models of Computer Programming](https://webperso.info.ucl.ac.be/~pvr/book.html)
-[^high-order-func]: 简单来说，高阶函数就是操作函数的函数。高阶函数可以接受一个或多个函数作为参数, 也可以返回一个函数作为结果. [参考wiki](https://en.wikipedia.org/wiki/Higher-order_function)
+[^high-order-func]: 简单来说, 高阶函数就是操作函数的函数. 高阶函数可以接受一个或多个函数作为参数, 也可以返回一个函数作为结果. [参考wiki](https://en.wikipedia.org/wiki/Higher-order_function)
 [^ansi-lisp]: [ANSI Common Lisp](https://paulgraham.com/acl.html)
 [^paul-talk-about-recursion]: 原文为
 

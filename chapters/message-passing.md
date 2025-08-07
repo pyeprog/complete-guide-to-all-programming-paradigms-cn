@@ -1,6 +1,6 @@
 # 消息传递模型
 
-之前提到的声明式并发模型中，线程之间无法交换数据，这限制了线程的应用。为了解决这一问题，Hoare在1978年的论文中提出了“Communicating Sequential Processes”模型，简称CSP模型。该模型通过线程间消息传递机制来解决并发中的问题，因此也被称为消息传递（message passing）模型。本文不再介绍早期模型的具体形式，而重点说明其当下最流行的形态——channel，并以Go语言中的channel作为示例进行说明。以下内容中，{underline}`goroutine与线程两个术语将不加区分使用`。
+之前提到的声明式并发模型中, 线程之间无法交换数据, 这限制了线程的应用. 为了解决这一问题, Hoare在1978年的论文中提出了“Communicating Sequential Processes”模型, 简称CSP模型. 该模型通过线程间消息传递机制来解决并发中的问题, 因此也被称为消息传递(message passing)模型. 本文不再介绍早期模型的具体形式, 而重点说明其当下最流行的形态——channel, 并以Go语言中的channel作为示例进行说明. 以下内容中, {underline}`goroutine与线程两个术语将不加区分使用`. 
 
 :::::{grid} 2
 
@@ -28,19 +28,19 @@
 
 ### Channel
 
-channel_在行为上_类似一个{abbr}`原子队列(AtomicQueue)`，你可以将数据对象放入channel，也可以从channel中取出数据，甚至channel还有容量的概念。从_对象的角度_来看，它是一等公民对象，可以传递到程序的各个角落，放入容器，甚至嵌套放入另一个channel中，且无需担心复制带来的开销。
+channel_在行为上_类似一个{abbr}`原子队列(AtomicQueue)`, 你可以将数据对象放入channel, 也可以从channel中取出数据, 甚至channel还有容量的概念. 从_对象的角度_来看, 它是一等公民对象, 可以传递到程序的各个角落, 放入容器, 甚至嵌套放入另一个channel中, 且无需担心复制带来的开销. 
 
 :::{image} ../material/how-channel-works.png  
 :width: 100%  
 :align: center  
 :::
 
-channel具有以下几个主要特性：  
+channel具有以下几个主要特性:   
 
-1. `读写操作均为原子化，因此无需担心数据竞争`，数据的读写是{abbr}`顺序的(sequential)`.
-2. `channel具有容量`，容量表示channel能够缓存的消息数量。默认容量为0. 即无缓存.
-3. `channel可以控制线程的挂起与恢复`。从空channel中读取数据会挂起线程，直到channel中有数据时恢复运行；同理，向已满的channel写入数据也会挂起线程，直到channel有空间时恢复运行。对于容量为0的channel，任何写入都会挂起，任何读取也会挂起，只有读写双方同时存在时才能交换数据，这实现了两个线程读写的同步。
-4. channel可以被关闭。关闭channel表示线程希望结束通信。`关闭后的channel不能写入，只能读取`。即使在channel关闭后仍有未读数据，数据也不会丢失，仍可按原样读取；数据读取完毕后，再次读取将得到该类型的默认值，例如int类型读取为0。  
+1. `读写操作均为原子化, 因此无需担心数据竞争`, 数据的读写是{abbr}`顺序的(sequential)`.
+2. `channel具有容量`, 容量表示channel能够缓存的消息数量. 默认容量为0. 即无缓存.
+3. `channel可以控制线程的挂起与恢复`. 从空channel中读取数据会挂起线程, 直到channel中有数据时恢复运行；同理, 向已满的channel写入数据也会挂起线程, 直到channel有空间时恢复运行. 对于容量为0的channel, 任何写入都会挂起, 任何读取也会挂起, 只有读写双方同时存在时才能交换数据, 这实现了两个线程读写的同步. 
+4. channel可以被关闭. 关闭channel表示线程希望结束通信. `关闭后的channel不能写入, 只能读取`. 即使在channel关闭后仍有未读数据, 数据也不会丢失, 仍可按原样读取；数据读取完毕后, 再次读取将得到该类型的默认值, 例如int类型读取为0.   
 
 |                    | ⛔ Closed Channel | ↗️ Active Channel            |
 | ------------------ | ---------------- | --------------------------- |
@@ -48,7 +48,7 @@ channel具有以下几个主要特性：
 | Send value to      | panic            | Block or succeed to send    |
 | Receive value from | Never block      | Block or succeed to receive |
 
-设想两个线程启动时共享同一个channel，一个线程写入数据，另一个线程读取数据。这样自然实现了数据传递，且不存在竞态条件，从而避免了数据错误等问题。
+设想两个线程启动时共享同一个channel, 一个线程写入数据, 另一个线程读取数据. 这样自然实现了数据传递, 且不存在竞态条件, 从而避免了数据错误等问题. 
 
 ```{code} go
 :linenos:
@@ -160,17 +160,17 @@ func main() {
 
 ## 怎么使用 Channel 和 Select
 
-这两个概念不难理解，但在实战中，channel 和 select 如何使用呢？
+这两个概念不难理解, 但在实战中, channel 和 select 如何使用呢? 
 
-首先说说用法。除了上面代码示例中的使用方式外，channel和select还有几个经典的使用模式。  
-首先是创建{abbr}`线程(这里指goroutine)`的经典模式。  
+首先说说用法. 除了上面代码示例中的使用方式外, channel和select还有几个经典的使用模式.   
+首先是创建{abbr}`线程(这里指goroutine)`的经典模式.   
 
 ### Channel Owner
 
 第一种经典写法是封装channel创建和对应channel的管理.\
-在大多数应用中, goroutine创建后，总会通过channel传出自己计算的结果。那么谁来管理这些channel？或者换句话说，计算完成后谁来关闭这些channel? \
+在大多数应用中, goroutine创建后, 总会通过channel传出自己计算的结果. 那么谁来管理这些channel? 或者换句话说, 计算完成后谁来关闭这些channel? \
 
-我们通常认为，`哪个goroutine向channel提供数据，channel就归谁管理`。因此，我们将创建channel和创建goroutine封装在一起，当goroutine结束时，channel也随之关闭.
+我们通常认为, `哪个goroutine向channel提供数据, channel就归谁管理`. 因此, 我们将创建channel和创建goroutine封装在一起, 当goroutine结束时, channel也随之关闭.
 
 ```{code} go
 :linenos:
@@ -214,11 +214,11 @@ func main() {
 ### Managing Channel
 
 第二种经典写法是, 我们使用channel来管理goroutine.\
-一般goroutine有两种行为模式, 一种是完成一定工作就结束退出, 一种是不断监听输入channel, 一旦有数据可取, 就执行相应操作。
+一般goroutine有两种行为模式, 一种是完成一定工作就结束退出, 一种是不断监听输入channel, 一旦有数据可取, 就执行相应操作. 
 
 对于第二种行为模式, 我们会希望能够控制goroutine, 使其结束监听. 这里我们使用channel, 让其传递结束信号来实现这一点.
 
-在实现时, 除了输入数据用的channel, 我们还需要另一个输入控制信号的channel。只需用select将数据和控制的channel并联起来, 正如例子中所示，在其他线程中，一旦向done channel发送任意值或关闭done channel，都会使该goroutine退出。
+在实现时, 除了输入数据用的channel, 我们还需要另一个输入控制信号的channel. 只需用select将数据和控制的channel并联起来, 正如例子中所示, 在其他线程中, 一旦向done channel发送任意值或关闭done channel, 都会使该goroutine退出. 
 
 ```{code} go
 :linenos:
@@ -286,12 +286,12 @@ func main() {
 [参考这篇blog](https://dev.to/souvikinator/pipeline-concurrency-pattern-in-go-a-comprehensive-visual-guide-2j0l)
 :::
 
-如果将一个计算拆分为若干步骤，每个步骤写成一个函数，并放入goroutine中不断循环执行。数据从一个goroutine传入，处理后输出给另一个goroutine，这样就组成了流水线。
+如果将一个计算拆分为若干步骤, 每个步骤写成一个函数, 并放入goroutine中不断循环执行. 数据从一个goroutine传入, 处理后输出给另一个goroutine, 这样就组成了流水线. 
 
 :::{figure} ../material/go-pipeline.svg
 :width: 100%
 :align: center
-每个步骤可以串联起来，甚至可以实现{abbr}`fan-out(一对多)`或{abbr}`fan-in(多聚一)`，以此构建更复杂的流水线。  
+每个步骤可以串联起来, 甚至可以实现{abbr}`fan-out(一对多)`或{abbr}`fan-in(多聚一)`, 以此构建更复杂的流水线.   
 :::
 
 ::::{tab-set}
@@ -540,7 +540,7 @@ func fanIn(ctx context.Context, chans ...<-chan int) <-chan int {
 
 ### 管理线程
 
-第二种应用涉及goroutine之间的管理。例如，总有一些goroutine会因各种原因报错并关闭，此时需要一个supervisor goroutine来管理其他worker goroutine，监听它们是否存活。如果失活，则由supervisor重启这些worker。  
+第二种应用涉及goroutine之间的管理. 例如, 总有一些goroutine会因各种原因报错并关闭, 此时需要一个supervisor goroutine来管理其他worker goroutine, 监听它们是否存活. 如果失活, 则由supervisor重启这些worker.   
 
 ```{code} go
 :linenos:
@@ -556,8 +556,8 @@ import (
   "time"
 )
 
-// Worker模拟一个工作goroutine，定期发送心跳。
-// 它会在一段时间后“死亡”，停止发送心跳。
+// Worker模拟一个工作goroutine, 定期发送心跳. 
+// 它会在一段时间后“死亡”, 停止发送心跳. 
 func worker(
   ctx context.Context,
   id int,
@@ -577,7 +577,7 @@ func worker(
     case <-ctx.Done():
       return
     case <-deathTimer.C:
-      // 工作goroutine“死亡”，通过返回停止发送心跳
+      // 工作goroutine“死亡”, 通过返回停止发送心跳
       fmt.Printf("Worker %d 死亡了\n", id)
       return
     case <-ticker.C:
@@ -592,7 +592,7 @@ func worker(
   }
 }
 
-// Supervisor监听工作goroutine的心跳，如果某个工作goroutine停止发送心跳，则重启它。
+// Supervisor监听工作goroutine的心跳, 如果某个工作goroutine停止发送心跳, 则重启它. 
 func supervisor(
   ctx context.Context,
   workerCount int,
@@ -647,7 +647,7 @@ func supervisor(
       now := time.Now()
       for id, last := range lastHeartbeat {
         if now.Sub(last) > checkInterval {
-          fmt.Printf("Supervisor: 工作goroutine %d 未收到心跳，正在重启\n", id)
+          fmt.Printf("Supervisor: 工作goroutine %d 未收到心跳, 正在重启\n", id)
           // 取消旧工作goroutine并启动新工作goroutine
           cancelFuncs[id]() // 取消旧的
           cancelFuncs[id] = startWorker(id)
@@ -672,7 +672,7 @@ func main() {
 
 :::{figure} ../material/supervisor-meme.jpg
 :width: 100%
-每个worker需额外返回一个心跳channel，并定期发送心跳信号。supervisor设定计时器，只要在计时器结束前收到心跳，即认为worker正常；反之，则杀死(关闭)旧的worker并启动新的worker。
+每个worker需额外返回一个心跳channel, 并定期发送心跳信号. supervisor设定计时器, 只要在计时器结束前收到心跳, 即认为worker正常；反之, 则杀死(关闭)旧的worker并启动新的worker. 
 :::
 
 ---

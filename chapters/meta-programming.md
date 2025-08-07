@@ -2,7 +2,7 @@
 
 最后要介绍的是{abbr}`元编程(meta programming)`. 这个模型的核心理念是`代码即数据`. 
 
-“代码即数据”的理念由冯·诺依曼早在1946年提出，冯·诺依曼机的设计也基于这一理念。因此，针对[元编程](https://en.wikipedia.org/wiki/Metaprogramming)的实践实际上由来已久。
+“代码即数据”的理念由冯·诺依曼早在1946年提出, 冯·诺依曼机的设计也基于这一理念. 因此, 针对[元编程](https://en.wikipedia.org/wiki/Metaprogramming)的实践实际上由来已久. 
 
 :::{image} ../material/meta-programming-meme.png
 :::
@@ -285,30 +285,30 @@ for field in fields(person):
 
 ---
 
-每种语言通常都会提供一种或多种相关能力。
+每种语言通常都会提供一种或多种相关能力. 
 
--  **编译型语言**一般支持模板(template)、宏(macro)，以实现元编程(meta programming)和泛化(generalization)。
--  **解释型语言**通常支持元编程、反射（reflection）以及元数据（meta-data）。
+-  **编译型语言**一般支持模板(template), 宏(macro), 以实现元编程(meta programming)和泛化(generalization). 
+-  **解释型语言**通常支持元编程, 反射(reflection)以及元数据(meta-data). 
 
 ## 什么时候使用meta Programming
 
-什么时候使用meta-programming呢？需要分情况讨论。
+什么时候使用meta-programming呢? 需要分情况讨论. 
 
--  **异质meta programming**在日常工作中使用较少，难度较大，频率不高。
--  **同质meta programming**在日常工作中较为常见。
+-  **异质meta programming**在日常工作中使用较少, 难度较大, 频率不高. 
+-  **同质meta programming**在日常工作中较为常见. 
 
-其中最常用的包括generalization、reflection和meta-data。
+其中最常用的包括generalization, reflection和meta-data. 
 
--  **Generalization**常用于实现通用算法函数和容器类。如果语言是动态类型（变量可绑定不同类型数据），则通常不会(也不需要)提供这类特性。
--  **Reflection**常用于判断对象类型、获取类的方法和数据列表、获取函数签名（参数列表和返回值）。动态构造类较难掌控，因此较少使用。
--  **Meta-data**最常见的用例是函数、类、模块的doc-string，几乎成为标配。
+-  **Generalization**常用于实现通用算法函数和容器类. 如果语言是动态类型(变量可绑定不同类型数据), 则通常不会(也不需要)提供这类特性. 
+-  **Reflection**常用于判断对象类型, 获取类的方法和数据列表, 获取函数签名(参数列表和返回值). 动态构造类较难掌控, 因此较少使用. 
+-  **Meta-data**最常见的用例是函数, 类, 模块的doc-string, 几乎成为标配. 
 
-编写meta-program相对不常用，且需细分：
+编写meta-program相对不常用, 且需细分: 
 
--  **Template meta programming**应尽量少用。许多技巧用于约束template的类型参数，若可能，C++20中的concept是更优选择。
--  **Macro**用于定义代码片段模板，后续可利用宏生成代码。此技巧影响巨大，也易反噬。经验法则是：如果不确定是否应使用meta programming，就不要使用；若确实需要定义宏，说明你非常了解其他方法无法满足需求，只有宏能解决。
+-  **Template meta programming**应尽量少用. 许多技巧用于约束template的类型参数, 若可能, C++20中的concept是更优选择. 
+-  **Macro**用于定义代码片段模板, 后续可利用宏生成代码. 此技巧影响巨大, 也易反噬. 经验法则是: 如果不确定是否应使用meta programming, 就不要使用；若确实需要定义宏, 说明你非常了解其他方法无法满足需求, 只有宏能解决. 
 
-最后，若代码库引入meta-programming技巧，`需大量测试覆盖。升级编译器或解释器版本时，甚至需要全量测试以确保业务系统行为不变`。
+最后, 若代码库引入meta-programming技巧, `需大量测试覆盖. 升级编译器或解释器版本时, 甚至需要全量测试以确保业务系统行为不变`. 
 
 ---
 

@@ -1,16 +1,16 @@
 # 逻辑编程模型
 
-{abbr}`逻辑编程模型(Logic Programming model)`同样属于声明式范畴，但与普通的declarative model不同，它引入了一种完全不同的编码范式。
+{abbr}`逻辑编程模型(Logic Programming model)`同样属于声明式范畴, 但与普通的declarative model不同, 它引入了一种完全不同的编码范式. 
 
-逻辑编程模型的`核心目标是在一个搜索空间(计算空间/数据空间)中，找到满足给定约束条件的一组数据`。
+逻辑编程模型的`核心目标是在一个搜索空间(计算空间/数据空间)中, 找到满足给定约束条件的一组数据`. 
 
 :::{figure} ../material/detective-conan.jpg
-例如，假设有若干件衣服、裤子及其他装饰品，需搜索（衣服, 裤子, 装饰）的元组，约束条件为不能出现红配蓝，且不能同时出现长袖、短裤和领结，目标是得到所有可能的搭配😅。
+例如, 假设有若干件衣服, 裤子及其他装饰品, 需搜索(衣服, 裤子, 装饰)的元组, 约束条件为不能出现红配蓝, 且不能同时出现长袖, 短裤和领结, 目标是得到所有可能的搭配😅. 
 :::
 
-在逻辑编程模型中，我们`只需指定搜索空间、约束条件和目标`，具体的搜索与回溯一般由内置的推理引擎(inference engine)执行。
+在逻辑编程模型中, 我们`只需指定搜索空间, 约束条件和目标`, 具体的搜索与回溯一般由内置的推理引擎(inference engine)执行. 
 
-此外，还有一种类似的模型称为{abbr}`关系模型(relational model)`，两者核心均为指定约束条件，在给定搜索空间中进行搜索。不同之处在于，`关系模型侧重于数据管理与查询`，常见于数据库领域；`而逻辑编程模型更关注逻辑推理`，相较关系模型更为通用。{underline}`鉴于两者内在逻辑相近，后续内容中不再特别区分`。
+此外, 还有一种类似的模型称为{abbr}`关系模型(relational model)`, 两者核心均为指定约束条件, 在给定搜索空间中进行搜索. 不同之处在于, `关系模型侧重于数据管理与查询`, 常见于数据库领域；`而逻辑编程模型更关注逻辑推理`, 相较关系模型更为通用. {underline}`鉴于两者内在逻辑相近, 后续内容中不再特别区分`. 
 
 :::{hint}logic programming模型需要三个核心功能
 1. 一种描述搜索空间的方式
@@ -127,14 +127,14 @@ WHERE -- 指定约束条件
 
 ## Prolog中的logic Programming Model
 
-{ref}`Prolog(Programming in Logic)<https://en.wikipedia.org/wiki/Prolog>`是一种基于{abbr}`逻辑编程(logic programming)`的声明式编程语言。Prolog诞生于上世纪70年代, 并一直`作为逻辑编程和关系模型的标杆`而存在. 和其他声明式语言一样, prolog也通过描述"**what**"而不是"how"来解决问题.
+{ref}`Prolog(Programming in Logic)<https://en.wikipedia.org/wiki/Prolog>`是一种基于{abbr}`逻辑编程(logic programming)`的声明式编程语言. Prolog诞生于上世纪70年代, 并一直`作为逻辑编程和关系模型的标杆`而存在. 和其他声明式语言一样, prolog也通过描述"**what**"而不是"how"来解决问题.
 
 关于prolog的语法可以参考这篇[cheatsheet](https://learnxinyminutes.com/prolog/).
 
-其基本构成要素有：
-• **事实（Facts）**：描述确定的关系，如 `parent(tom, bob).`, `parent(alice, tom).`
-• **规则（Rules）**：定义推理逻辑，如 `grandparent(X,Z) :- parent(X,Y), parent(Y,Z).`
-• **查询（Queries）**：提出问题，如 `?- grandparent(alice, bob).`
+其基本构成要素有: 
+• **事实(Facts)**: 描述确定的关系, 如 `parent(tom, bob).`, `parent(alice, tom).`
+• **规则(Rules)**: 定义推理逻辑, 如 `grandparent(X,Z) :- parent(X,Y), parent(Y,Z).`
+• **查询(Queries)**: 提出问题, 如 `?- grandparent(alice, bob).`
 
 - `.`结尾代表语句结束. 
 - `:-`代表后续语句定义前面的predicate. 
@@ -211,12 +211,12 @@ print_solutions([[Shirt, Pants, Socks]|Rest]) :-
 .
 ```
 
-Prolog是一门有趣且实用的语言，曾在人工智能、专家系统、自然语言处理、数据库查询和符号推理等领域取得出色表现，值得深入了解。
+Prolog是一门有趣且实用的语言, 曾在人工智能, 专家系统, 自然语言处理, 数据库查询和符号推理等领域取得出色表现, 值得深入了解. 
 
 ## 什么时候使用logic Programming Model?
 
-毫无疑问，在`解决搜索问题时，使用逻辑编程模型是最合适的`。虽然该模型也能用于编写通用代码，但这并非其设计初衷。
+毫无疑问, 在`解决搜索问题时, 使用逻辑编程模型是最合适的`. 虽然该模型也能用于编写通用代码, 但这并非其设计初衷. 
 
-目前原生直接支持逻辑变成或关系模型的语言并不多，但主流语言通常会提供相关的三方包或库，例如Python中的[kanren](https://github.com/pythological/kanren)、Java中的[LogicNG](https://www.logicng.org/)等等.
+目前原生直接支持逻辑变成或关系模型的语言并不多, 但主流语言通常会提供相关的三方包或库, 例如Python中的[kanren](https://github.com/pythological/kanren), Java中的[LogicNG](https://www.logicng.org/)等等.
 
-在业务中遇到搜索问题时，可以尝试采用该模型, 而对于大量结构化数据的查询，则应优先使用数据库及SQL(或其封装)。
+在业务中遇到搜索问题时, 可以尝试采用该模型, 而对于大量结构化数据的查询, 则应优先使用数据库及SQL(或其封装). 

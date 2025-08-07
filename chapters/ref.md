@@ -1,6 +1,9 @@
 # 参考材料
 
-本文参考了以下资料中的内容。 
+本文参考了以下资料中的内容.  
+
+:::{image} ../material/overall-ref-content.png
+:::
 
 ## 书
 
